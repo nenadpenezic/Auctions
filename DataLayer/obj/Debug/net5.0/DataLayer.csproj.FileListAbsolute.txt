@@ -1,0 +1,15 @@
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\DataLayer.deps.json
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\DataLayer.runtimeconfig.json
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\DataLayer.runtimeconfig.dev.json
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\DataLayer.dll
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\ref\DataLayer.dll
+D:\Diplomski rad\DataLayer\bin\Debug\net5.0\DataLayer.pdb
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.csproj.AssemblyReference.cache
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.AssemblyInfoInputs.cache
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.AssemblyInfo.cs
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.csproj.CoreCompileInputs.cache
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.dll
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\ref\DataLayer.dll
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.pdb
+D:\Diplomski rad\DataLayer\obj\Debug\net5.0\DataLayer.genruntimeconfig.cache
