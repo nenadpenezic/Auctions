@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuctionsAppAPI", "AuctionsAppAPI.csproj", "{6A2FCC07-C46E-4F5C-A877-5329640BB162}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "..\DataLayer\DataLayer.csproj", "{6ED01217-54E3-4E62-9689-C5E62661129B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "..\DataLayer\DataLayer.csproj", "{6ED01217-54E3-4E62-9689-C5E62661129B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

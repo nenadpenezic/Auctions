@@ -1,3 +1,5 @@
+using AuctionsAppAPI.EmailClient;
+using AuctionsAppAPI.Services;
 using DataLayer.DatabaseConfiguration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +33,7 @@ namespace AuctionsAppAPI
             services.AddDbContext<AuctionsDBContext>(config => {
                 config.UseSqlServer(Configuration.GetConnectionString("Default"));
             });
+            services.AddTransient<IEmailClient, MailkitClient>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

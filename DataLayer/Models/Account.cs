@@ -14,5 +14,6 @@ namespace DataLayer.Models
         public string VerificationString { get; set; }
         public bool IsAccountVerifyed { get; set; }
 
+
     }
 }

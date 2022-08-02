@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    [Migration("20220802134914_DatabaseCreation")]
+    [Migration("20220802145731_DatabaseCreation")]
     partial class DatabaseCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

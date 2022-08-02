@@ -61,3 +61,8 @@ D:\Diplomski rad\AuctionsAppAPI\obj\Debug\net5.0\AuctionsAppAPI.dll
 D:\Diplomski rad\AuctionsAppAPI\obj\Debug\net5.0\ref\AuctionsAppAPI.dll
 D:\Diplomski rad\AuctionsAppAPI\obj\Debug\net5.0\AuctionsAppAPI.pdb
 D:\Diplomski rad\AuctionsAppAPI\obj\Debug\net5.0\AuctionsAppAPI.genruntimeconfig.cache
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\FluentEmail.Core.dll
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\FluentEmail.Smtp.dll
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\MailKit.dll
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\MimeKit.dll
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\BouncyCastle.Crypto.dll

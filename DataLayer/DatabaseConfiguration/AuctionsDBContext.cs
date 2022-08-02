@@ -22,9 +22,9 @@ namespace DataLayer.DatabaseConfiguration
             }
 
             modelBuilder.Entity<User>()
-                .HasOne(user =>user.Account )
+                .HasOne(user => user.Account )
                 .WithOne()
-                .HasForeignKey<User>(acc=>acc.UserID);
+                .HasForeignKey<User>(user=>user.UserID);
 
 
             modelBuilder.Entity<UserReview>()
