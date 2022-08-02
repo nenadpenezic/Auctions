@@ -21,12 +21,11 @@ namespace DataLayer.DatabaseConfiguration
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            modelBuilder.Entity<User>()
-                .HasOne(account => account.Account)
+            modelBuilder.Entity<Account>()
+                .HasOne(user => user.User)
                 .WithOne()
-                .HasForeignKey<User>(user => user.UserID);
+                .HasForeignKey<Account>(acc=>acc.AccountID);
 
-            modelBuilder.Entity<User>().HasKey(user => user.UserID);
 
             modelBuilder.Entity<UserReview>()
                 .HasKey(ur => ur.UserReviewID);

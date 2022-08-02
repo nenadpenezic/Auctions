@@ -22,9 +22,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Models.Account", b =>
                 {
                     b.Property<int>("AccountID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -186,7 +184,9 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Models.User", b =>
                 {
                     b.Property<int>("UserID")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("JMBG")
                         .HasColumnType("int");
@@ -240,6 +240,17 @@ namespace DataLayer.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("UserReviews");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.Account", b =>
+                {
+                    b.HasOne("DataLayer.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("DataLayer.Models.Account", "AccountID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataLayer.Models.Auction", b =>
@@ -309,17 +320,6 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AuctionParticipant");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.User", b =>
-                {
-                    b.HasOne("DataLayer.Models.Account", "Account")
-                        .WithOne()
-                        .HasForeignKey("DataLayer.Models.User", "UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("DataLayer.Models.UserReview", b =>

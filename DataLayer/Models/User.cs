@@ -9,7 +9,6 @@ namespace DataLayer.Models
     public class User
     {
         public int UserID { get; set; }
-        public Account Account { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
         public int JMBG { get; set; }

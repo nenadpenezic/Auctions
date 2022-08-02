@@ -9,6 +9,7 @@ namespace DataLayer.Models
     public class Account
     {
         public int AccountID { get; set; }
+        public User User { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string VerificationString { get; set; }
