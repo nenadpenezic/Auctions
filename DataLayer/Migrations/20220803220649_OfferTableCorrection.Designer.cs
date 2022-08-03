@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220803220649_OfferTableCorrection")]
+    partial class OfferTableCorrection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,6 +145,12 @@ namespace DataLayer.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("ItemAuctionParticipantItemID1")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemAuctionParticipantUserID1")
+                        .HasColumnType("int");
+
                     b.Property<int>("ItemID")
                         .HasColumnType("int");
 
@@ -156,6 +164,8 @@ namespace DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("OfferID");
+
+                    b.HasIndex("ItemAuctionParticipantUserID1", "ItemAuctionParticipantItemID1");
 
                     b.HasIndex("ItemID", "UserID");
 
@@ -274,8 +284,12 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Models.Offer", b =>
                 {
-                    b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
+                    b.HasOne("DataLayer.Models.ItemAuctionParticipant", null)
                         .WithMany("Offers")
+                        .HasForeignKey("ItemAuctionParticipantUserID1", "ItemAuctionParticipantItemID1");
+
+                    b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
+                        .WithMany()
                         .HasForeignKey("ItemID", "UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

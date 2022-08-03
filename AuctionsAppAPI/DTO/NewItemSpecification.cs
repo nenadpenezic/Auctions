@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace DataLayer.Models
+namespace AuctionsAppAPI.DTO
 {
-    public class ItemSpecification
+    public class NewItemSpecification
     {
-        public int ItemSpecificationID { get; set; }
-        public Item Item { get; set; }
         public string SpecificationName { get; set; }
         public string SpecificationValue { get; set; }
     }

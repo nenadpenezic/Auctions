@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class DatabaseCreation : Migration
+    public partial class RecreationOfDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,20 +21,6 @@ namespace DataLayer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.AccountID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Items",
-                columns: table => new
-                {
-                    ItemID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Items", x => x.ItemID);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,49 +47,23 @@ namespace DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ItemSpecifications",
+                name: "Items",
                 columns: table => new
                 {
-                    ItemSpecificationID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ItemID = table.Column<int>(type: "int", nullable: true),
-                    SpecificationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SpecificationValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ItemSpecifications", x => x.ItemSpecificationID);
-                    table.ForeignKey(
-                        name: "FK_ItemSpecifications_Items_ItemID",
-                        column: x => x.ItemID,
-                        principalTable: "Items",
-                        principalColumn: "ItemID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Auctions",
-                columns: table => new
-                {
-                    AuctionID = table.Column<int>(type: "int", nullable: false)
+                    ItemID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    ItemID = table.Column<int>(type: "int", nullable: false),
+                    OwnerUserID = table.Column<int>(type: "int", nullable: true),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuctionStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false)
+                    SoldDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Auctions", x => x.AuctionID);
+                    table.PrimaryKey("PK_Items", x => x.ItemID);
                     table.ForeignKey(
-                        name: "FK_Auctions_Items_ItemID",
-                        column: x => x.ItemID,
-                        principalTable: "Items",
-                        principalColumn: "ItemID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Auctions_Users_UserID",
-                        column: x => x.UserID,
+                        name: "FK_Items_Users_OwnerUserID",
+                        column: x => x.OwnerUserID,
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.Restrict);
@@ -165,16 +125,16 @@ namespace DataLayer.Migrations
                 columns: table => new
                 {
                     UserID = table.Column<int>(type: "int", nullable: false),
-                    AuctionID = table.Column<int>(type: "int", nullable: false)
+                    ItemID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuctionParticipants", x => new { x.UserID, x.AuctionID });
+                    table.PrimaryKey("PK_AuctionParticipants", x => new { x.UserID, x.ItemID });
                     table.ForeignKey(
-                        name: "FK_AuctionParticipants_Auctions_AuctionID",
-                        column: x => x.AuctionID,
-                        principalTable: "Auctions",
-                        principalColumn: "AuctionID",
+                        name: "FK_AuctionParticipants_Items_ItemID",
+                        column: x => x.ItemID,
+                        principalTable: "Items",
+                        principalColumn: "ItemID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AuctionParticipants_Users_UserID",
@@ -185,42 +145,57 @@ namespace DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ItemSpecifications",
+                columns: table => new
+                {
+                    ItemSpecificationID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ItemID = table.Column<int>(type: "int", nullable: true),
+                    SpecificationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpecificationValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemSpecifications", x => x.ItemSpecificationID);
+                    table.ForeignKey(
+                        name: "FK_ItemSpecifications_Items_ItemID",
+                        column: x => x.ItemID,
+                        principalTable: "Items",
+                        principalColumn: "ItemID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Offers",
                 columns: table => new
                 {
                     OfferID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    AuctionID = table.Column<int>(type: "int", nullable: false),
+                    OfferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AuctionParticipantUserID = table.Column<int>(type: "int", nullable: true),
-                    AuctionParticipantAuctionID = table.Column<int>(type: "int", nullable: true),
+                    AuctionParticipantItemID = table.Column<int>(type: "int", nullable: true),
                     Value = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Offers", x => x.OfferID);
                     table.ForeignKey(
-                        name: "FK_Offers_AuctionParticipants_AuctionParticipantUserID_AuctionParticipantAuctionID",
-                        columns: x => new { x.AuctionParticipantUserID, x.AuctionParticipantAuctionID },
+                        name: "FK_Offers_AuctionParticipants_AuctionParticipantUserID_AuctionParticipantItemID",
+                        columns: x => new { x.AuctionParticipantUserID, x.AuctionParticipantItemID },
                         principalTable: "AuctionParticipants",
-                        principalColumns: new[] { "UserID", "AuctionID" },
+                        principalColumns: new[] { "UserID", "ItemID" },
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuctionParticipants_AuctionID",
+                name: "IX_AuctionParticipants_ItemID",
                 table: "AuctionParticipants",
-                column: "AuctionID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Auctions_ItemID",
-                table: "Auctions",
                 column: "ItemID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Auctions_UserID",
-                table: "Auctions",
-                column: "UserID");
+                name: "IX_Items_OwnerUserID",
+                table: "Items",
+                column: "OwnerUserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemSpecifications_ItemID",
@@ -233,9 +208,9 @@ namespace DataLayer.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Offers_AuctionParticipantUserID_AuctionParticipantAuctionID",
+                name: "IX_Offers_AuctionParticipantUserID_AuctionParticipantItemID",
                 table: "Offers",
-                columns: new[] { "AuctionParticipantUserID", "AuctionParticipantAuctionID" });
+                columns: new[] { "AuctionParticipantUserID", "AuctionParticipantItemID" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReviews_ReviewerID",
@@ -264,9 +239,6 @@ namespace DataLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "AuctionParticipants");
-
-            migrationBuilder.DropTable(
-                name: "Auctions");
 
             migrationBuilder.DropTable(
                 name: "Items");

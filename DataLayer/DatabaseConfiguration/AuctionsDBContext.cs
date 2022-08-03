@@ -40,8 +40,19 @@ namespace DataLayer.DatabaseConfiguration
                .WithMany()
                .HasForeignKey(ur => ur.ReviewerID);
 
-            modelBuilder.Entity<AuctionParticipant>()
-                .HasKey(ap => new { ap.UserID, ap.AuctionID });
+            modelBuilder.Entity<Item>()
+                .HasOne(owner => owner.Owner)
+                .WithMany()
+                .HasForeignKey(owner => owner.OwnerID);
+
+            modelBuilder.Entity<ItemAuctionParticipant>()
+                .HasKey(ap => new { ap.UserID, ap.ItemID });
+
+            modelBuilder.Entity<Offer>()
+                .HasOne(o => o.ItemAuctionParticipant)
+                .WithMany(iap=>iap.Offers)
+                .HasForeignKey(fk => new { fk.ItemID, fk.UserID });
+
 
         }
         public DbSet<Account> Accounts { get; set; }
@@ -50,8 +61,8 @@ namespace DataLayer.DatabaseConfiguration
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemSpecification> ItemSpecifications { get; set; }
-        public DbSet<Auction> Auctions { get; set; }
-        public DbSet<AuctionParticipant> AuctionParticipants { get; set; }
+        //public DbSet<Auction> Auctions { get; set; }
+        public DbSet<ItemAuctionParticipant> AuctionParticipants { get; set; }
         public DbSet<Offer> Offers { get; set; }
 
     }

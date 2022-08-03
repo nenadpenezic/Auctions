@@ -10,8 +10,9 @@ namespace DataLayer.Models
     {
         public int OfferID { get; set; }
         public int UserID { get; set; }
-        public int AuctionID { get; set; }
-        public AuctionParticipant AuctionParticipant {get; set;}
+        public int ItemID { get; set; }
+        public DateTime OfferDate { get; set; }
+        public ItemAuctionParticipant ItemAuctionParticipant { get; set;}
         public int Value { get; set; }
 
 

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    [Migration("20220802145731_DatabaseCreation")]
-    partial class DatabaseCreation
+    [Migration("20220803221135_OfferTableCorrectionv1")]
+    partial class OfferTableCorrectionv1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,52 +45,6 @@ namespace DataLayer.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Auction", b =>
-                {
-                    b.Property<int>("AuctionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("AuctionStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ItemID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AuctionID");
-
-                    b.HasIndex("ItemID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("Auctions");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.AuctionParticipant", b =>
-                {
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AuctionID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserID", "AuctionID");
-
-                    b.HasIndex("AuctionID");
-
-                    b.ToTable("AuctionParticipants");
-                });
-
             modelBuilder.Entity("DataLayer.Models.Item", b =>
                 {
                     b.Property<int>("ItemID")
@@ -98,21 +52,49 @@ namespace DataLayer.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ItemName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SoldDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ItemID");
+
+                    b.HasIndex("OwnerID");
 
                     b.ToTable("Items");
                 });
 
+            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
+                {
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserID", "ItemID");
+
+                    b.HasIndex("ItemID");
+
+                    b.ToTable("AuctionParticipants");
+                });
+
             modelBuilder.Entity("DataLayer.Models.ItemSpecification", b =>
                 {
-                    b.Property<string>("ItemSpecificationID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("ItemSpecificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("ItemID")
                         .HasColumnType("int");
@@ -163,14 +145,11 @@ namespace DataLayer.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AuctionID")
+                    b.Property<int>("ItemID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AuctionParticipantAuctionID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AuctionParticipantUserID")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("OfferDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserID")
                         .HasColumnType("int");
@@ -180,7 +159,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("OfferID");
 
-                    b.HasIndex("AuctionParticipantUserID", "AuctionParticipantAuctionID");
+                    b.HasIndex("ItemID", "UserID");
 
                     b.ToTable("Offers");
                 });
@@ -244,10 +223,21 @@ namespace DataLayer.Migrations
                     b.ToTable("UserReviews");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Auction", b =>
+            modelBuilder.Entity("DataLayer.Models.Item", b =>
+                {
+                    b.HasOne("DataLayer.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
                 {
                     b.HasOne("DataLayer.Models.Item", "Item")
-                        .WithMany()
+                        .WithMany("ItemAuctionParticipants")
                         .HasForeignKey("ItemID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -259,25 +249,6 @@ namespace DataLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.AuctionParticipant", b =>
-                {
-                    b.HasOne("DataLayer.Models.Auction", "Auction")
-                        .WithMany("AuctionParticipants")
-                        .HasForeignKey("AuctionID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DataLayer.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
 
                     b.Navigation("User");
                 });
@@ -305,12 +276,13 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Models.Offer", b =>
                 {
-                    b.HasOne("DataLayer.Models.AuctionParticipant", "AuctionParticipant")
+                    b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
                         .WithMany("Offers")
-                        .HasForeignKey("AuctionParticipantUserID", "AuctionParticipantAuctionID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ItemID", "UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("AuctionParticipant");
+                    b.Navigation("ItemAuctionParticipant");
                 });
 
             modelBuilder.Entity("DataLayer.Models.User", b =>
@@ -343,19 +315,16 @@ namespace DataLayer.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Auction", b =>
-                {
-                    b.Navigation("AuctionParticipants");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.AuctionParticipant", b =>
-                {
-                    b.Navigation("Offers");
-                });
-
             modelBuilder.Entity("DataLayer.Models.Item", b =>
                 {
+                    b.Navigation("ItemAuctionParticipants");
+
                     b.Navigation("ItemSpecifications");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
+                {
+                    b.Navigation("Offers");
                 });
 
             modelBuilder.Entity("DataLayer.Models.User", b =>

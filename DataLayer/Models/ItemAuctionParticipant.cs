@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class AuctionParticipant
+    public class ItemAuctionParticipant
     {
         public int UserID { get; set; }
         public User User { get; set; }
-        public int AuctionID { get; set; }
-        public Auction Auction { get; set; }
+        public Item Item { get; set; }
+        public int ItemID { get; set; }
         public ICollection<Offer> Offers { get; set; }
 
     }
