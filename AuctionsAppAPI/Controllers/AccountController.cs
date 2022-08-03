@@ -1,13 +1,17 @@
 ﻿using AuctionsAppAPI.DTO;
 using AuctionsAppAPI.EmailClient;
-using AuctionsAppAPI.Services;
+using AuctionsAppAPI.Authorization;
 using DataLayer.DatabaseConfiguration;
 using DataLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.Controllers
@@ -19,16 +23,30 @@ namespace AuctionsAppAPI.Controllers
 
         private IEmailClient emailClient;
         private AuctionsDBContext auctionsDBContext;
-        public AccountController(IEmailClient _emailClient, 
-            AuctionsDBContext _auctionsDBContext)
+        private ITokenAuthorization userAuthorization;
+        public AccountController(
+            IEmailClient _emailClient, 
+            AuctionsDBContext _auctionsDBContext, 
+            ITokenAuthorization _userAuthorization)
         {
             emailClient = _emailClient;
             auctionsDBContext = _auctionsDBContext;
+            userAuthorization = _userAuthorization;
         }
+
+
         [HttpPost("add-account")]
         public ActionResult AddAccount([FromBody] NewAccount newAccount)
         {
-            string verificationString = StringGenerator.GenerateVerificationString();
+            string verificationString = GenerateVerificationString();
+
+            Account existingAccoutn = auctionsDBContext.Accounts
+                .Where(acc => acc.Email == newAccount.Email)
+                .FirstOrDefault();
+
+            if (existingAccoutn != null)
+                return BadRequest("Account with this email address aready exist!");
+
 
             Account account = new Account()
             {
@@ -50,10 +68,47 @@ namespace AuctionsAppAPI.Controllers
         [HttpGet("verify/{userID}/{verificationString}")]
         public ActionResult VerifyAccount(int userID,string verificationString)
         {
-            var account = auctionsDBContext.Accounts.Where(acc => acc.AccountID == userID).FirstOrDefault();
+            var account = auctionsDBContext.Accounts
+                .Where(acc => acc.AccountID == userID)
+                .FirstOrDefault();
             account.IsAccountVerifyed = true;
             auctionsDBContext.SaveChanges();
             return Ok(verificationString);
+        }
+
+        [HttpPost("log-in")]
+        public ActionResult LogIn([FromBody] LogIn login)
+        {
+            Account account = auctionsDBContext.Accounts
+                .Where(acc => acc.Email == login.Email && acc.Password == login.Password)
+                .FirstOrDefault();
+
+            if (account == null)
+                return BadRequest("Wrong Email or Password!");
+
+            if (!account.IsAccountVerifyed)
+                return BadRequest("Account must be verified first");
+
+            string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
+            return Ok(new { Token = tokenString });
+        }
+
+
+
+
+
+
+
+
+
+        private string GenerateVerificationString()
+        {
+            char[] allowedCharacters = "qwertyuiopasdfghjklzxcvbnm1234567890".ToCharArray();
+            Random random = new Random();
+            string verificationString = "";
+            for (int i = 0; i < 195; i++)
+                verificationString += allowedCharacters[random.Next(0, allowedCharacters.Length)];
+            return verificationString;
         }
 
     }

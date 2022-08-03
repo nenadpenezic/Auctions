@@ -1,6 +1,7 @@
+using AuctionsAppAPI.Authorization;
 using AuctionsAppAPI.EmailClient;
-using AuctionsAppAPI.Services;
 using DataLayer.DatabaseConfiguration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,10 +11,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuctionsAppAPI
@@ -33,7 +36,33 @@ namespace AuctionsAppAPI
             services.AddDbContext<AuctionsDBContext>(config => {
                 config.UseSqlServer(Configuration.GetConnectionString("Default"));
             });
+
+
+            services.AddAuthentication(config =>
+            {
+                config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(jwtb =>
+            {
+                jwtb.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "https://localhost:44301",
+                    ValidAudience = "https://localhost:44301",
+
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                };
+            });
+
+
             services.AddTransient<IEmailClient, MailkitClient>();
+            services.AddScoped<ITokenAuthorization, JwtAuthorization>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -54,6 +83,8 @@ namespace AuctionsAppAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
