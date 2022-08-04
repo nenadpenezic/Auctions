@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220804133954_ColumnRename")]
+    partial class ColumnRename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,7 +203,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("OfferID");
 
-                    b.HasIndex("UserID", "ItemID");
+                    b.HasIndex("ItemID", "UserID");
 
                     b.ToTable("Offers");
                 });
@@ -339,7 +341,7 @@ namespace DataLayer.Migrations
                 {
                     b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
                         .WithMany("Offers")
-                        .HasForeignKey("UserID", "ItemID")
+                        .HasForeignKey("ItemID", "UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

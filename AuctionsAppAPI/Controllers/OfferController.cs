@@ -2,6 +2,7 @@
 using AuctionsAppAPI.DTO;
 using DataLayer.DatabaseConfiguration;
 using DataLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -26,6 +27,7 @@ namespace AuctionsAppAPI.Controllers
         }
 
         [HttpPost("add-offer")]
+        [Authorize]
         public ActionResult AddOffer([FromBody] NewOffer newOffer)
         {
             int UserID = tokenAuthorization.GetCurrentUser(User.Claims);
@@ -35,15 +37,11 @@ namespace AuctionsAppAPI.Controllers
                 .FirstOrDefault();
 
             if (existingParticipant == null)
-            {
-                ItemAuctionParticipant participant = new ItemAuctionParticipant()
+                auctionsDBContext.AuctionParticipants.Add(new ItemAuctionParticipant()
                 {
                     UserID = UserID,
                     ItemID = newOffer.ItemID
-                };
-
-                auctionsDBContext.AuctionParticipants.Add(participant);
-            }
+                });
             
             Offer offer = new Offer()
             {
@@ -54,9 +52,24 @@ namespace AuctionsAppAPI.Controllers
             };
 
             auctionsDBContext.Offers.Add(offer);
-            auctionsDBContext.SaveChanges();
+            if(auctionsDBContext.SaveChanges()>0)
+                return Ok();
 
-            return Ok();
+            return StatusCode(500);
+
+        }
+        [HttpGet("item-offers/{offerID}")]
+        public ActionResult GetProductOffers(int offerID)
+        {
+            List<OfferView> offers = auctionsDBContext.Offers.Where(offer => offer.OfferID == offerID)
+                .Select(offer => new OfferView
+                {
+                    Name = offer.ItemAuctionParticipant.User.Name,
+                    Lastname = offer.ItemAuctionParticipant.User.Lastname,
+                    Value = offer.Value,
+                    OfferDate = offer.OfferDate
+                }).ToList();
+            return Ok(offers);
         }
     }
 }

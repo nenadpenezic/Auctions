@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220804114140_CategoryAndItemPhotoEntityAdded")]
+    partial class CategoryAndItemPhotoEntityAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +75,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("ItemName")
@@ -83,7 +84,7 @@ namespace DataLayer.Migrations
                     b.Property<int>("OwnerID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("SoldDate")
+                    b.Property<DateTime>("SoldDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ItemID");
@@ -201,7 +202,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("OfferID");
 
-                    b.HasIndex("UserID", "ItemID");
+                    b.HasIndex("ItemID", "UserID");
 
                     b.ToTable("Offers");
                 });
@@ -339,7 +340,7 @@ namespace DataLayer.Migrations
                 {
                     b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
                         .WithMany("Offers")
-                        .HasForeignKey("UserID", "ItemID")
+                        .HasForeignKey("ItemID", "UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

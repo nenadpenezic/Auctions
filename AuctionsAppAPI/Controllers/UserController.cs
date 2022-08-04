@@ -42,7 +42,7 @@ namespace AuctionsAppAPI.Controllers
             };
 
             auctionsDBContext.Users.Add(user);
-            int result = auctionsDBContext.SaveChanges();
+            auctionsDBContext.SaveChanges();
             return Ok(user.UserID);
         }
 

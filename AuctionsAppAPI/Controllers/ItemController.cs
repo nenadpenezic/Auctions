@@ -2,6 +2,7 @@
 using AuctionsAppAPI.DTO;
 using DataLayer.DatabaseConfiguration;
 using DataLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -24,7 +25,9 @@ namespace AuctionsAppAPI.Controllers
             auctionsDBContext = _auctionsDBContext;
             tokenAuthorization = _tokenAuthorization;
         }
+
         [HttpPost("add-item")]
+        [Authorize]
         public ActionResult AddItem([FromBody] NewItem newItem)
         {
             Item item = new Item()
@@ -33,27 +36,26 @@ namespace AuctionsAppAPI.Controllers
                 OwnerID = tokenAuthorization.GetCurrentUser(User.Claims),
                 Description = newItem.Description,
                 AddedDate = DateTime.Now,
-                SoldDate = DateTime.Now
+                CategoryID =newItem.CategoryID
             };
 
-            ICollection<ItemSpecification> icl = new List<ItemSpecification>();
+            ICollection<ItemSpecification> itemSpecifications = new List<ItemSpecification>();
 
             foreach (NewItemSpecification element in newItem.NewItemSpecifications)
-            {
-                ItemSpecification itemSpecification = new ItemSpecification()
+                itemSpecifications.Add(new ItemSpecification()
                 {
                     SpecificationName = element.SpecificationName,
                     SpecificationValue = element.SpecificationValue
-                };
-
-                icl.Add(itemSpecification);
-            }
-            item.ItemSpecifications = icl;
+                });
+            
+            item.ItemSpecifications = itemSpecifications;
 
             auctionsDBContext.Items.Add(item);
-            auctionsDBContext.SaveChanges();
 
-            return Ok();
+            if (auctionsDBContext.SaveChanges() <= 0)
+                return StatusCode(500);
+
+            return Ok("Item inserted.");
         }
     }
 }

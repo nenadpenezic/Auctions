@@ -51,7 +51,7 @@ namespace DataLayer.DatabaseConfiguration
             modelBuilder.Entity<Offer>()
                 .HasOne(o => o.ItemAuctionParticipant)
                 .WithMany(iap=>iap.Offers)
-                .HasForeignKey(fk => new { fk.ItemID, fk.UserID });
+                .HasForeignKey(fk => new {fk.UserID, fk.ItemID });
 
 
         }
@@ -64,6 +64,8 @@ namespace DataLayer.DatabaseConfiguration
         //public DbSet<Auction> Auctions { get; set; }
         public DbSet<ItemAuctionParticipant> AuctionParticipants { get; set; }
         public DbSet<Offer> Offers { get; set; }
+        public DbSet<ItemPhoto> ItemPhotos { get; set; }
+        public DbSet<Category> Categorys { get; set; }
 
     }
 }

@@ -62,7 +62,7 @@ namespace AuctionsAppAPI.Controllers
             string confirmationString = "<a href='" + "https://localhost:44301/api/Account/verify/"+ account.AccountID + "/" + verificationString +"'/>Click here to verify your accout</a>";
             emailClient.SendEmail(account.Email, confirmationString);
 
-            return Ok(account);
+            return Ok("Check your email to confirm email adress and finish registration");
         }
 
         [HttpGet("verify/{userID}/{verificationString}")]
@@ -73,6 +73,7 @@ namespace AuctionsAppAPI.Controllers
                 .FirstOrDefault();
             account.IsAccountVerifyed = true;
             auctionsDBContext.SaveChanges();
+
             return Ok(verificationString);
         }
 
@@ -88,6 +89,11 @@ namespace AuctionsAppAPI.Controllers
 
             if (!account.IsAccountVerifyed)
                 return BadRequest("Account must be verified first");
+
+            User user = auctionsDBContext.Users.Find(account.AccountID);
+
+            if (user == null)
+                return BadRequest("Finish creation of profile first.");
 
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
             return Ok(new { Token = tokenString });
