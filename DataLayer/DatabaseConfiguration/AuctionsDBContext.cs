@@ -16,10 +16,9 @@ namespace DataLayer.DatabaseConfiguration
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            {
-                foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
-            }
+           
+
+            
 
             modelBuilder.Entity<User>()
                 .HasOne(user => user.Account )
@@ -32,7 +31,7 @@ namespace DataLayer.DatabaseConfiguration
 
             modelBuilder.Entity<UserReview>()
                 .HasOne(user => user.User)
-                .WithMany()
+                .WithMany(user=>user.UserPersonalReviews)
                 .HasForeignKey(ur => ur.UserID);
 
             modelBuilder.Entity<UserReview>()
@@ -42,7 +41,7 @@ namespace DataLayer.DatabaseConfiguration
 
             modelBuilder.Entity<Item>()
                 .HasOne(owner => owner.Owner)
-                .WithMany()
+                .WithMany(user=>user.Items)
                 .HasForeignKey(owner => owner.OwnerID);
 
             modelBuilder.Entity<ItemAuctionParticipant>()
@@ -54,6 +53,13 @@ namespace DataLayer.DatabaseConfiguration
                 .HasForeignKey(fk => new {fk.UserID, fk.ItemID });
 
 
+            
+
+            foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            {
+                foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
+            }
+            base.OnModelCreating(modelBuilder);
         }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<User> Users { get; set; }

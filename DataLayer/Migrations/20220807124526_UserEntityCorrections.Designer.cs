@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220807124526_UserEntityCorrections")]
+    partial class UserEntityCorrections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,13 +272,13 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Models.User", "Owner")
                         .WithMany("Items")
                         .HasForeignKey("OwnerID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -289,13 +291,13 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Item", "Item")
                         .WithMany("ItemAuctionParticipants")
                         .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Item");
@@ -308,7 +310,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Item", "Item")
                         .WithMany("ItemPhotos")
                         .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Item");
@@ -319,7 +321,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Item", "Item")
                         .WithMany("ItemSpecifications")
                         .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Item");
                 });
@@ -329,7 +331,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -340,7 +342,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
                         .WithMany("Offers")
                         .HasForeignKey("UserID", "ItemID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ItemAuctionParticipant");
@@ -351,7 +353,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Account", "Account")
                         .WithOne()
                         .HasForeignKey("DataLayer.Models.User", "UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -362,13 +364,13 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.User", "Reviewer")
                         .WithMany()
                         .HasForeignKey("ReviewerID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Models.User", "User")
-                        .WithMany("UserPersonalReviews")
+                        .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Reviewer");
@@ -395,8 +397,6 @@ namespace DataLayer.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Notifications");
-
-                    b.Navigation("UserPersonalReviews");
                 });
 #pragma warning restore 612, 618
         }

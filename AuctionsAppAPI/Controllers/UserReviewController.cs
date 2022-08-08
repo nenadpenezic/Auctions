@@ -48,8 +48,8 @@ namespace AuctionsAppAPI.Controllers
             return StatusCode(500);
         }
 
-        [HttpPost("get-reviews/{userID}")]
-        [Authorize]
+        [HttpGet("get-reviews/{userID}")]
+     
         public ActionResult GetUserReviews(int userID)
         {
             List<Review> userReviews = auctionsDBContext.UserReviews

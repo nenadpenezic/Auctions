@@ -91,12 +91,21 @@ namespace AuctionsAppAPI.Controllers
                 return BadRequest("Account must be verified first");
 
             User user = auctionsDBContext.Users.Find(account.AccountID);
+            AuthenticatedUser authenticatedUser = new AuthenticatedUser();
+
 
             if (user == null)
-                return BadRequest("Finish creation of profile first.");
+                authenticatedUser.IsAccountComplete = false;
+            else
+            {
+                authenticatedUser.UserID = account.AccountID;
+                authenticatedUser.IsAccountComplete = true;
+                authenticatedUser.Name = user.Name;
+                authenticatedUser.Lastname = user.Lastname;
+            }
 
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
-            return Ok(new { Token = tokenString });
+            return Ok(new { Token = tokenString, userObj = authenticatedUser});
         }
 
 

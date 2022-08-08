@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.DTO
 {
-    public class NewUser
+    public class AuthenticatedUser
     {
+        public int UserID { get; set; }
+        public bool IsAccountComplete { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
-        public string EmailForContact { get; set; }
-        public int PhoneNumber { get; set; }
     }
 }

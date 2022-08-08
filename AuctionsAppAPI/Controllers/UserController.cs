@@ -35,7 +35,7 @@ namespace AuctionsAppAPI.Controllers
                 UserID = userAuthorization.GetCurrentUser(User.Claims),
                 Name = newUser.Name,
                 Lastname = newUser.Lastname,
-                JMBG = newUser.JMBG,
+                EmailForContact = newUser.EmailForContact,
                 PhoneNumber = newUser.PhoneNumber,
                 JoinDate = DateTime.Now,
                 LastTimeOnline = DateTime.Now
@@ -45,6 +45,27 @@ namespace AuctionsAppAPI.Controllers
             auctionsDBContext.SaveChanges();
             return Ok(user.UserID);
         }
+
+        [HttpGet("user-profile/{userID}")]
+        public ActionResult GetUserProfile(int userID)
+        {
+            UserProfile userProfile = auctionsDBContext.Users.Where(user => user.UserID == userID).
+                Select(userProfile => new UserProfile {
+                    Name = userProfile.Name,
+                    Lastname = userProfile.Lastname,
+                    EmailForContact = userProfile.EmailForContact,
+                    PhoneNumber = userProfile.PhoneNumber,
+                    JoinDate = userProfile.JoinDate,
+                    LastTimeOnline = userProfile.LastTimeOnline,
+                    //AverageGrade = userProfile.UserPersonalReviews).Select(ups => ups.Grade).Average(),
+                    NumberOfReviews = userProfile.UserPersonalReviews.Count,
+                    NumberOfItemsOnSale = userProfile.Items.Count
+                }).FirstOrDefault();
+            return Ok(userProfile);
+        }
+
+       
+
 
     }
 }

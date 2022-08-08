@@ -57,5 +57,17 @@ namespace AuctionsAppAPI.Controllers
 
             return Ok("Item inserted.");
         }
+        [HttpGet("get-user-items/{userID}")]
+        public ActionResult GetUserItems(int userID)
+        {
+            List<UserItem> userItems = auctionsDBContext.Items.Where(item => item.OwnerID == userID)
+                .Select(item => new UserItem
+                {
+                    ItemName = item.ItemName,
+                    CurrentPrice = 0,
+                }).ToList();
+
+            return Ok(userItems);
+        }
     }
 }
