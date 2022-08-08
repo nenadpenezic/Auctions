@@ -7,7 +7,6 @@ namespace AuctionsAppAPI.DTO
 {
     public class NewOffer
     {
-        public int ItemID { get; set; }
         public int Value { get; set; }
     }
 }

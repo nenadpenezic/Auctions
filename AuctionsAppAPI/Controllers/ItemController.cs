@@ -36,14 +36,15 @@ namespace AuctionsAppAPI.Controllers
                 OwnerID = tokenAuthorization.GetCurrentUser(User.Claims),
                 Description = newItem.Description,
                 AddedDate = DateTime.Now,
-                CategoryID =newItem.CategoryID
+                CategoryID = newItem.CategoryID,
+                Price = 500
             };
 
             ICollection<ItemSpecification> itemSpecifications = new List<ItemSpecification>();
 
             foreach (NewItemSpecification element in newItem.NewItemSpecifications)
                 itemSpecifications.Add(new ItemSpecification()
-                {
+               {
                     SpecificationName = element.SpecificationName,
                     SpecificationValue = element.SpecificationValue
                 });
@@ -52,22 +53,60 @@ namespace AuctionsAppAPI.Controllers
 
             auctionsDBContext.Items.Add(item);
 
-            if (auctionsDBContext.SaveChanges() <= 0)
-                return StatusCode(500);
+            auctionsDBContext.SaveChanges();
 
-            return Ok("Item inserted.");
+            return Ok();
         }
         [HttpGet("get-user-items/{userID}")]
         public ActionResult GetUserItems(int userID)
         {
-            List<UserItem> userItems = auctionsDBContext.Items.Where(item => item.OwnerID == userID)
-                .Select(item => new UserItem
-                {
-                    ItemName = item.ItemName,
-                    CurrentPrice = 0,
-                }).ToList();
+            List<Item> userItems = auctionsDBContext.Items.Where(item => item.OwnerID == userID).ToList();
+            List<UserItem> userItemsDTO = new List<UserItem>();
 
-            return Ok(userItems);
+            foreach (Item item in userItems)
+            {
+                bool acceptedOffer = item.AcceptedOffer==null?false:true;
+                userItemsDTO.Add(new UserItem()
+                {   ItemID = item.ItemID,
+                    ItemName = item.ItemName,
+                    CurrentPrice = item.Price,
+                    IsSold = acceptedOffer
+
+                });
+            }
+
+            return Ok(userItemsDTO);
+        }
+
+        [HttpGet("item-details/{itemID}")]
+        public ActionResult GetItemDetails(int itemID)
+        {
+            ItemDetails itemDetails = auctionsDBContext.Items.Where(item => item.ItemID == itemID)
+                .Select(item => new ItemDetails
+                {
+                    ItemID = item.ItemID,
+                    OwnerID = item.OwnerID,
+                    ItemName = item.ItemName,
+                    Description = item.Description,
+                    ItemSpecifications = item.ItemSpecifications,
+                    Offers = item.Offers.OrderByDescending(order=>order.Value)
+                    .Select(offer=> new ItemDetailsOffer{
+
+                        OfferID = offer.OfferID,
+                        UserID = offer.UserID,
+                        Name = offer.User.Name,
+                        Lastname = offer.User.Lastname,
+                        OfferDate = offer.OfferDate,
+                        Value = offer.Value,
+                        IsAccepted = offer.isAccepted
+                    
+                    }).ToList(),
+                    AddedDate = item.AddedDate,
+                    SoldDate = item.SoldDate,
+                    Price = item.Price
+                }).FirstOrDefault();
+
+            return Ok(itemDetails);
         }
     }
 }

@@ -26,50 +26,75 @@ namespace AuctionsAppAPI.Controllers
             tokenAuthorization = _tokenAuthorization;
         }
 
-        [HttpPost("add-offer")]
+        [HttpPost("add-offer/{itemID}")]
         [Authorize]
-        public ActionResult AddOffer([FromBody] NewOffer newOffer)
+        public ActionResult AddOffer(int itemID,[FromBody] int offerValue)
         {
             int UserID = tokenAuthorization.GetCurrentUser(User.Claims);
 
-            ItemAuctionParticipant existingParticipant = auctionsDBContext.AuctionParticipants
-                .Where(p => p.UserID == UserID && p.ItemID == newOffer.ItemID)
+            Offer lastOffer = auctionsDBContext.Offers
+                .OrderByDescending(offer => offer.Value)
+                .Where(offer=>offer.ItemID == itemID)
                 .FirstOrDefault();
 
-            if (existingParticipant == null)
-                auctionsDBContext.AuctionParticipants.Add(new ItemAuctionParticipant()
-                {
-                    UserID = UserID,
-                    ItemID = newOffer.ItemID
-                });
-            
+            if(lastOffer != null)
+            {
+                if (lastOffer.isAccepted)
+                    return BadRequest("Item is aready sold!");
+
+                if (lastOffer.Value > offerValue)
+                    return BadRequest("You must offer higher sum than previus one!");
+            }
+
+
             Offer offer = new Offer()
             {
-               ItemID = newOffer.ItemID,
+               ItemID = itemID,
                UserID = UserID,
-               Value = newOffer.Value,
+               Value = offerValue,
                OfferDate = DateTime.Now
             };
+            
 
             auctionsDBContext.Offers.Add(offer);
-            if(auctionsDBContext.SaveChanges()>0)
+
+            Item offerItem = auctionsDBContext.Items.Find(itemID);
+            offerItem.Price = offerValue;
+
+            if (auctionsDBContext.SaveChanges()>0)
                 return Ok();
 
             return StatusCode(500);
 
         }
-        [HttpGet("item-offers/{offerID}")]
-        public ActionResult GetProductOffers(int offerID)
+        [HttpGet("item-offers/{itemID}")]
+        public ActionResult GetProductOffers(int itemID)
         {
-            List<OfferView> offers = auctionsDBContext.Offers.Where(offer => offer.OfferID == offerID)
-                .Select(offer => new OfferView
-                {
-                    Name = offer.ItemAuctionParticipant.User.Name,
-                    Lastname = offer.ItemAuctionParticipant.User.Lastname,
-                    Value = offer.Value,
-                    OfferDate = offer.OfferDate
-                }).ToList();
+            List<ItemDetailsOffer> offers = auctionsDBContext.Offers.OrderByDescending(order => order.Value)
+                    .Select(offer => new ItemDetailsOffer
+                    {
+                        OfferID = offer.OfferID,
+                        UserID = offer.UserID,
+                        Name = offer.User.Name,
+                        Lastname = offer.User.Lastname,
+                        OfferDate = offer.OfferDate,
+                        Value = offer.Value,
+                        IsAccepted = offer.isAccepted
+
+                    }).ToList();
             return Ok(offers);
+        }
+
+        [HttpPost("accept-offer/{offerID}")]
+        public ActionResult AcceptOffer(int offerID) 
+        {
+            Offer offer = auctionsDBContext.Offers.Where(offer=>offer.OfferID == offerID).FirstOrDefault();
+            offer.isAccepted = true;
+            Item item = auctionsDBContext.Items.Where(item => item.ItemID == offer.ItemID).FirstOrDefault();
+            item.AcceptedOfferID = offer.ItemID;
+            auctionsDBContext.SaveChanges();
+
+            return Ok();
         }
     }
 }

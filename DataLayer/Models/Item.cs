@@ -21,7 +21,11 @@ namespace DataLayer.Models
         [Column(TypeName = "varchar(100)")]
         public string Description { get; set; }
         public ICollection<ItemSpecification> ItemSpecifications { get; set; }
-        public ICollection<ItemAuctionParticipant> ItemAuctionParticipants { get; set; }
+
+        public ICollection<Offer> Offers { get; set; }
+
+        public int? AcceptedOfferID { get; set; }
+        public Offer? AcceptedOffer { get; set; }
         [Required]
         public DateTime AddedDate { get; set; }
         public DateTime? SoldDate { get; set; }
@@ -29,6 +33,7 @@ namespace DataLayer.Models
         public int CategoryID { get; set; }
         public Category Category { get; set; }
         public ICollection<ItemPhoto> ItemPhotos { get; set; }
+        public double Price { get; set; }
 
     }
 }

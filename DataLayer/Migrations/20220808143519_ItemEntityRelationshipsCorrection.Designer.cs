@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    [Migration("20220807114812_AddedContactEmailColumnInUserTable")]
-    partial class AddedContactEmailColumnInUserTable
+    [Migration("20220808143519_ItemEntityRelationshipsCorrection")]
+    partial class ItemEntityRelationshipsCorrection
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -85,6 +85,9 @@ namespace DataLayer.Migrations
                     b.Property<int>("OwnerID")
                         .HasColumnType("int");
 
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
                     b.Property<DateTime?>("SoldDate")
                         .HasColumnType("datetime2");
 
@@ -95,21 +98,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("OwnerID");
 
                     b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
-                {
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ItemID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserID", "ItemID");
-
-                    b.HasIndex("ItemID");
-
-                    b.ToTable("AuctionParticipants");
                 });
 
             modelBuilder.Entity("DataLayer.Models.ItemPhoto", b =>
@@ -201,9 +189,14 @@ namespace DataLayer.Migrations
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isAccepted")
+                        .HasColumnType("bit");
+
                     b.HasKey("OfferID");
 
-                    b.HasIndex("UserID", "ItemID");
+                    b.HasIndex("ItemID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Offers");
                 });
@@ -272,13 +265,13 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Models.User", "Owner")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("OwnerID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -286,31 +279,12 @@ namespace DataLayer.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
-                {
-                    b.HasOne("DataLayer.Models.Item", "Item")
-                        .WithMany("ItemAuctionParticipants")
-                        .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DataLayer.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DataLayer.Models.ItemPhoto", b =>
                 {
                     b.HasOne("DataLayer.Models.Item", "Item")
                         .WithMany("ItemPhotos")
                         .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Item");
@@ -321,7 +295,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Item", "Item")
                         .WithMany("ItemSpecifications")
                         .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Item");
                 });
@@ -331,7 +305,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -339,13 +313,21 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Models.Offer", b =>
                 {
-                    b.HasOne("DataLayer.Models.ItemAuctionParticipant", "ItemAuctionParticipant")
-                        .WithMany("Offers")
-                        .HasForeignKey("UserID", "ItemID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("DataLayer.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemID")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ItemAuctionParticipant");
+                    b.HasOne("DataLayer.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataLayer.Models.User", b =>
@@ -353,7 +335,7 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.Account", "Account")
                         .WithOne()
                         .HasForeignKey("DataLayer.Models.User", "UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -364,13 +346,13 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Models.User", "Reviewer")
                         .WithMany()
                         .HasForeignKey("ReviewerID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Models.User", "User")
-                        .WithMany()
+                        .WithMany("UserPersonalReviews")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Reviewer");
@@ -380,21 +362,18 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Models.Item", b =>
                 {
-                    b.Navigation("ItemAuctionParticipants");
-
                     b.Navigation("ItemPhotos");
 
                     b.Navigation("ItemSpecifications");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.ItemAuctionParticipant", b =>
-                {
-                    b.Navigation("Offers");
-                });
-
             modelBuilder.Entity("DataLayer.Models.User", b =>
                 {
+                    b.Navigation("Items");
+
                     b.Navigation("Notifications");
+
+                    b.Navigation("UserPersonalReviews");
                 });
 #pragma warning restore 612, 618
         }

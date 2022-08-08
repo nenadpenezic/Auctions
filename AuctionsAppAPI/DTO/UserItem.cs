@@ -7,7 +7,9 @@ namespace AuctionsAppAPI.DTO
 {
     public class UserItem
     {
+        public int ItemID { get; set; }
         public string ItemName { get; set; }
-        public int CurrentPrice { get; set; }
+        public double CurrentPrice { get; set; }
+        public bool IsSold { get; set; }
     }
 }
