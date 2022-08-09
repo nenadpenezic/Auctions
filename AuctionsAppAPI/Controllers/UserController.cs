@@ -59,7 +59,8 @@ namespace AuctionsAppAPI.Controllers
                     LastTimeOnline = userProfile.LastTimeOnline,
                     //AverageGrade = userProfile.UserPersonalReviews).Select(ups => ups.Grade).Average(),
                     NumberOfReviews = userProfile.UserPersonalReviews.Count,
-                    NumberOfItemsOnSale = userProfile.Items.Count
+                    NumberOfItemsOnSale = userProfile.Items.Count,
+ 
                 }).FirstOrDefault();
             return Ok(userProfile);
         }

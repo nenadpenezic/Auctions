@@ -65,12 +65,15 @@ namespace AuctionsAppAPI.Controllers
 
             foreach (Item item in userItems)
             {
-                bool acceptedOffer = item.AcceptedOffer==null?false:true;
+                Offer acceptedOffer = auctionsDBContext.Offers
+                    .Where(offer=>offer.ItemID == item.ItemID && offer.isAccepted)
+                    .FirstOrDefault();
+
                 userItemsDTO.Add(new UserItem()
                 {   ItemID = item.ItemID,
                     ItemName = item.ItemName,
                     CurrentPrice = item.Price,
-                    IsSold = acceptedOffer
+                    IsSold = acceptedOffer != null ? true : false
 
                 });
             }

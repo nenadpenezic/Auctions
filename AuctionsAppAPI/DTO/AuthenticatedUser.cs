@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,5 +12,6 @@ namespace AuctionsAppAPI.DTO
         public bool IsAccountComplete { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
+        public ICollection<NotificationDTO> Notifications {get; set;}
     }
 }

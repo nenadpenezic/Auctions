@@ -98,10 +98,22 @@ namespace AuctionsAppAPI.Controllers
                 authenticatedUser.IsAccountComplete = false;
             else
             {
+                List<NotificationDTO> notifications = auctionsDBContext
+                    .Notifications
+                    .Where(notification => notification.UserID == user.UserID)
+                    .Select(notification => new NotificationDTO { 
+                        NotificationID = notification.NotificationID,
+                        NotificationText = notification.NotificationText,
+                        ArriveDate = notification.ArriveDate,
+                        Open = notification.Open
+                    })
+                    .ToList();
+
                 authenticatedUser.UserID = account.AccountID;
                 authenticatedUser.IsAccountComplete = true;
                 authenticatedUser.Name = user.Name;
                 authenticatedUser.Lastname = user.Lastname;
+                authenticatedUser.Notifications = notifications;
             }
 
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
