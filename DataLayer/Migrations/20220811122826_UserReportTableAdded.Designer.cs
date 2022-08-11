@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220811122826_UserReportTableAdded")]
+    partial class UserReportTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +32,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAccountVerifyed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
@@ -81,9 +80,6 @@ namespace DataLayer.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
-
-                    b.Property<bool>("IsItemBlocked")
-                        .HasColumnType("bit");
 
                     b.Property<string>("ItemName")
                         .IsRequired()

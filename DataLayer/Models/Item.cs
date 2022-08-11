@@ -34,6 +34,7 @@ namespace DataLayer.Models
         public Category Category { get; set; }
         public ICollection<ItemPhoto> ItemPhotos { get; set; }
         public double Price { get; set; }
+        public bool IsItemBlocked { get; set; }
 
     }
 }

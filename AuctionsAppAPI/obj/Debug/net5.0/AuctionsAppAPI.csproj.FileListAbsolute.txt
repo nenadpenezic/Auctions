@@ -66,3 +66,4 @@ D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\MailKit.dll
 D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\MimeKit.dll
 D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\BouncyCastle.Crypto.dll
 D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Diplomski rad\AuctionsAppAPI\bin\Debug\net5.0\Newtonsoft.Json.dll

@@ -75,6 +75,9 @@ namespace AuctionsAppAPI.Controllers
                 IsAccepted = offer.isAccepted
             }).FirstOrDefault();
 
+            if(lastOffer==null)
+                return Ok(itemDetailsOffer);
+
             Notification notification = new Notification()
             {
                 UserID = lastOffer.UserID,
@@ -86,7 +89,6 @@ namespace AuctionsAppAPI.Controllers
             auctionsDBContext.SaveChanges();
 
             return Ok(itemDetailsOffer);
-
 
         }
         [HttpGet("item-offers/{itemID}")]
@@ -118,6 +120,8 @@ namespace AuctionsAppAPI.Controllers
              if (offer.isAccepted)
                 return BadRequest("Offer accepted aready");
              offer.isAccepted = true;
+            Item item = auctionsDBContext.Items.Where(item => item.ItemID == offer.ItemID).FirstOrDefault();
+            item.AcceptedOfferID = offer.OfferID;
              auctionsDBContext.SaveChanges();
 
             return Ok(offerID);
@@ -125,9 +129,13 @@ namespace AuctionsAppAPI.Controllers
         [HttpGet("reject-offer/{offerID}")]
         public ActionResult RejectOffer(int offerID)
         {
-            Offer offer = auctionsDBContext.Offers.Where(offer => offer.OfferID == offerID).FirstOrDefault();
-
+            Offer offer = auctionsDBContext.Offers
+                .Where(offer => offer.OfferID == offerID)
+                .FirstOrDefault();
             auctionsDBContext.Offers.Remove(offer);
+
+            
+
             auctionsDBContext.SaveChanges();
 
             return Ok();

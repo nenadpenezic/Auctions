@@ -13,7 +13,7 @@ namespace DataLayer.Models
         public string Password { get; set; }
         public string VerificationString { get; set; }
         public bool IsAccountVerifyed { get; set; }
-
+        public bool IsBlocked { get; set; }
 
     }
 }

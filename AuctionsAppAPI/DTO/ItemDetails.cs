@@ -16,6 +16,7 @@ namespace AuctionsAppAPI.DTO
         public string Description { get; set; }
         public ICollection<ItemSpecification> ItemSpecifications { get; set; }
         public ICollection<ItemDetailsOffer> Offers { get; set; }
+        public ICollection<string> ItemPhotos { get; set; }
         public DateTime AddedDate { get; set; }
         public DateTime? SoldDate { get; set; }
         

@@ -10,4 +10,9 @@ namespace AuctionsAppAPI.DTO
         public string SpecificationName { get; set; }
         public string SpecificationValue { get; set; }
     }
+
+    public class NewItemSpecifications
+    {
+        public ICollection <NewItemSpecification> NewItemSpecificationList { get; set; }
+    }
 }

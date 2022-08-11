@@ -90,42 +90,77 @@ namespace AuctionsAppAPI.Controllers
             if (!account.IsAccountVerifyed)
                 return BadRequest("Account must be verified first");
 
-            User user = auctionsDBContext.Users.Find(account.AccountID);
-            AuthenticatedUser authenticatedUser = new AuthenticatedUser();
+            //User user = auctionsDBContext.Users.Find(account.AccountID);
 
-
-            if (user == null)
-                authenticatedUser.IsAccountComplete = false;
-            else
-            {
-                List<NotificationDTO> notifications = auctionsDBContext
-                    .Notifications
-                    .Where(notification => notification.UserID == user.UserID)
-                    .Select(notification => new NotificationDTO { 
+            AuthenticatedUser authenticatedUser = auctionsDBContext.Users.Where(user => user.UserID == account.AccountID)
+                .Select(user => new AuthenticatedUser
+                {
+                    UserID = user.UserID,
+                    Name = user.Name,
+                    Lastname = user.Lastname,
+                    Notifications = user.Notifications.Select(notification => new NotificationDTO
+                    {
                         NotificationID = notification.NotificationID,
                         NotificationText = notification.NotificationText,
                         ArriveDate = notification.ArriveDate,
-                        Open = notification.Open
+                        Open = notification.Open,
+                        
                     })
-                    .ToList();
+                    .ToList(),
+                    IsAccountComplete = true
+                    }).FirstOrDefault();
 
-                authenticatedUser.UserID = account.AccountID;
-                authenticatedUser.IsAccountComplete = true;
-                authenticatedUser.Name = user.Name;
-                authenticatedUser.Lastname = user.Lastname;
-                authenticatedUser.Notifications = notifications;
-            }
+
+            //if (user == null)
+              //  authenticatedUser.IsAccountComplete = false;
+           // else
+           // {
+              //  List<NotificationDTO> notifications = auctionsDBContext
+                 //   .Notifications
+                   // .Where(notification => notification.UserID == user.UserID)
+                   // .Select(notification => new NotificationDTO { 
+                    //    NotificationID = notification.NotificationID,
+                      //  NotificationText = notification.NotificationText,
+                      //  ArriveDate = notification.ArriveDate,
+                      //  Open = notification.Open
+                   // })
+                   // .ToList();
+
+               // authenticatedUser.UserID = account.AccountID;
+               // authenticatedUser.IsAccountComplete = true;
+              //  authenticatedUser.Name = user.Name;
+              //  authenticatedUser.Lastname = user.Lastname;
+               // authenticatedUser.Notifications = notifications;
+           // }
 
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
             return Ok(new { Token = tokenString, userObj = authenticatedUser});
         }
 
+        [HttpGet("block-account/{accountID}")]
+        public ActionResult BlockAccount(int accountID)
+        {
+            Account account = auctionsDBContext.Accounts
+                .Where(account => account.AccountID == accountID)
+                .FirstOrDefault();
+            account.IsBlocked = true;
+            if(auctionsDBContext.SaveChanges() > 0)
+                return Ok();
 
+            return BadRequest();
+        }
+        [HttpGet("unblock-account/{accountID}")]
+        public ActionResult UnblockAccount(int accountID)
+        {
+            Account account = auctionsDBContext.Accounts
+                .Where(account => account.AccountID == accountID)
+                .FirstOrDefault();
+            account.IsBlocked = false;
+            if (auctionsDBContext.SaveChanges() > 0)
+                return Ok();
 
-
-
-
-
+            return BadRequest();
+        }
 
 
         private string GenerateVerificationString()

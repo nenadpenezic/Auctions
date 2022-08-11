@@ -54,8 +54,16 @@ namespace DataLayer.DatabaseConfiguration
                 .WithMany()
                 .HasForeignKey(item => item.AcceptedOfferID);
 
+            modelBuilder.Entity<UserReport>()
+                .HasOne(ur => ur.UserReporter)
+                .WithMany()
+                .HasForeignKey(ur => ur.UserReporterID);
 
-            
+            modelBuilder.Entity<UserReport>()
+                .HasOne(ur => ur.ReportAgainstUser)
+                .WithMany()
+                .HasForeignKey(ur => ur.ReportAgainstUserID);
+
 
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
@@ -74,6 +82,6 @@ namespace DataLayer.DatabaseConfiguration
         public DbSet<Offer> Offers { get; set; }
         public DbSet<ItemPhoto> ItemPhotos { get; set; }
         public DbSet<Category> Categorys { get; set; }
-
+        public DbSet<UserReport> UserReports { get; set; }
     }
 }

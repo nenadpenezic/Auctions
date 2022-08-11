@@ -43,7 +43,26 @@ namespace AuctionsAppAPI.Controllers
 
             auctionsDBContext.Users.Add(user);
             auctionsDBContext.SaveChanges();
-            return Ok(user.UserID);
+
+            AuthenticatedUser authenticatedUser = auctionsDBContext.Users.Where(authUser => authUser.UserID == user.UserID)
+                .Select(user => new AuthenticatedUser
+                {
+                    UserID = user.UserID,
+                    Name = user.Name,
+                    Lastname = user.Lastname,
+                    Notifications = user.Notifications.Select(notification => new NotificationDTO
+                    {
+                        NotificationID = notification.NotificationID,
+                        NotificationText = notification.NotificationText,
+                        ArriveDate = notification.ArriveDate,
+                        Open = notification.Open,
+
+                    })
+                    .ToList(),
+                    IsAccountComplete = true
+                }).FirstOrDefault();
+
+            return Ok(authenticatedUser);
         }
 
         [HttpGet("user-profile/{userID}")]
@@ -60,12 +79,38 @@ namespace AuctionsAppAPI.Controllers
                     //AverageGrade = userProfile.UserPersonalReviews).Select(ups => ups.Grade).Average(),
                     NumberOfReviews = userProfile.UserPersonalReviews.Count,
                     NumberOfItemsOnSale = userProfile.Items.Count,
- 
+
                 }).FirstOrDefault();
             return Ok(userProfile);
         }
 
-       
+
+
+        [HttpPost("administrator-users")]
+        public ActionResult GetUsersForAdministrator([FromBody] string name)
+        {
+            List<string> nameSplit = name.Split(' ').ToList();
+
+            if (nameSplit.Count == 1)
+            {
+                nameSplit[0] = name;
+                nameSplit.Add("");
+            }
+                
+
+            List<UserAdministrationProfile> userAdministrationProfiles = auctionsDBContext.Users
+                .Where(user => user.Name.Contains(nameSplit[0]) && user.Lastname.Contains(nameSplit[1])).
+                Select(user=>new UserAdministrationProfile
+                {
+                    Name = user.Name,
+                    Lastname = user.Lastname,
+                    EmailForContact = user.EmailForContact,
+                    PhoneNumber = user.PhoneNumber,
+                    IsBlocked = user.Account.IsBlocked
+                })
+                .ToList();
+            return Ok(userAdministrationProfiles);
+        }
 
 
     }

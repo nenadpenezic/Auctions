@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "t2vC9fJyzfhDWvhBVIdzC0juEAGvGW17dltLJhSrjmnKmwA1vUeSwt2vChpOTWwtfvGHdLq3Wh1dBSinbCiHWQ==",
+  "dgSpecHash": "1k0+Cf/+lJbHtHvzg8ivysyLkjGZVo3Avvf/ndlS1fE5zo5zq3JzXeRK3BGNuoFsqDoPATdsDyWdSaVDl5Qn6Q==",
   "success": true,
   "projectFilePath": "D:\\Diplomski rad\\AuctionsAppAPI\\AuctionsAppAPI.csproj",
   "expectedPackageFiles": [
@@ -41,6 +41,7 @@
     "C:\\Users\\PC\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\mimekit\\3.3.0\\mimekit.3.3.0.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",

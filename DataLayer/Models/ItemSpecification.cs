@@ -9,6 +9,7 @@ namespace DataLayer.Models
     public class ItemSpecification
     {
         public int ItemSpecificationID { get; set; }
+        public int ItemID { get; set; }
         public Item Item { get; set; }
         public string SpecificationName { get; set; }
         public string SpecificationValue { get; set; }
