@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,5 +12,6 @@ namespace AuctionsAppAPI.DTO
         public string Lastname { get; set; }
         public string EmailForContact { get; set; }
         public int PhoneNumber { get; set; }
+        public IFormFile ProfilePicture { get; set; }
     }
 }

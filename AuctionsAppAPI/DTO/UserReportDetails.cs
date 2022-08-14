@@ -9,6 +9,7 @@ namespace AuctionsAppAPI.DTO
 {
     public class UserReportDetails
     {
+        public int ReporterID { get; set; }
         public string ReporterName { get; set; }
         public string ReporterLastname { get; set; }
 
@@ -18,6 +19,6 @@ namespace AuctionsAppAPI.DTO
 
         public string ReportTitle { get; set; }
         public string ReportDetails { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime ReportDate { get; set; }
     }
 }

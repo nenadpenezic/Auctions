@@ -55,6 +55,7 @@ namespace AuctionsAppAPI.Controllers
         {
             List<UserReportDetails> userReportDetails = auctionsDBContext.UserReports.Select(userReport => new UserReportDetails
             {
+                ReporterID = userReport.UserReporterID,
                 ReporterName = userReport.UserReporter.Name,
                 ReporterLastname = userReport.UserReporter.Lastname,
 
@@ -63,10 +64,33 @@ namespace AuctionsAppAPI.Controllers
 
                 ReportTitle = userReport.ReportTitle,
                 ReportDetails = userReport.ReportDetails,
-           
+                
+                ReportDate = userReport.DateTime
             }).ToList();
 
             return Ok(userReportDetails);
         }
-    }
+
+
+        [HttpPost("administrator/send-report-notification/{userID}")]
+
+        public ActionResult SendReportStatusNotification([FromBody] string notificationText,int userID)
+        {
+
+            Notification notification = new Notification()
+            {
+                UserID = userID,
+                NotificationText = notificationText,
+                ArriveDate = DateTime.Now,
+                Open = false
+            };
+            auctionsDBContext.Notifications.Add(notification);
+            if (auctionsDBContext.SaveChanges() > 0)
+                return Ok(notificationText);
+
+            return BadRequest();
+        }
+
+
+        }
 }

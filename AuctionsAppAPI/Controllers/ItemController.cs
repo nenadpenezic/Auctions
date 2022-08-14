@@ -36,12 +36,9 @@ namespace AuctionsAppAPI.Controllers
 
         [HttpPost("add-item")]
         [Authorize]
-        public ActionResult AddItem([FromForm] NewItem newItem)
+        public ActionResult AddItem([FromForm ] NewItem newItem)
         {
-          
-
-          
-
+           
             Item item = new Item()
             {
                 ItemName = newItem.ItemName,
@@ -52,8 +49,8 @@ namespace AuctionsAppAPI.Controllers
                 Price = 500
             };
 
-
-            List<NewItemSpecification> newItemSpecifications = JsonConvert.DeserializeObject<List<NewItemSpecification>>(newItem.NewItemSpecifications);
+            List<NewItemSpecification> newItemSpecifications = JsonConvert
+                .DeserializeObject<List<NewItemSpecification>>(newItem.NewItemSpecifications);
             ICollection<ItemSpecification> itemSpecifications = new List<ItemSpecification>();
 
             foreach (NewItemSpecification element in newItemSpecifications)
@@ -67,17 +64,21 @@ namespace AuctionsAppAPI.Controllers
             item.ItemSpecifications = itemSpecifications;
 
 
-            
+
             ICollection<ItemPhoto> itemPhotos  = new List<ItemPhoto>();
 
-            itemPhotos.Add(new ItemPhoto
-            {
-                PhotoUrl = UploadItemPhotos(newItem.ItemPicture)
-            });
-
+            foreach (IFormFile element in newItem.ItemPictures)
+           {
+                itemPhotos.Add(new ItemPhoto
+                {
+                   PhotoUrl = UploadItemPhotos(element)
+                });
+            }
             item.ItemPhotos = itemPhotos;
-            auctionsDBContext.Items.Add(item);
 
+
+
+            auctionsDBContext.Items.Add(item);
             auctionsDBContext.SaveChanges();
 
             return Ok();
@@ -87,25 +88,22 @@ namespace AuctionsAppAPI.Controllers
         [HttpGet("get-user-items/{userID}")]
         public ActionResult GetUserItems(int userID)
         {
-            List<Item> userItems = auctionsDBContext.Items.Where(item => item.OwnerID == userID).ToList();
-            List<UserItem> userItemsDTO = new List<UserItem>();
-
-            foreach (Item item in userItems)
-            {
-                Offer acceptedOffer = auctionsDBContext.Offers
-                    .Where(offer=>offer.ItemID == item.ItemID && offer.isAccepted)
-                    .FirstOrDefault();
-
-                userItemsDTO.Add(new UserItem()
-                {   ItemID = item.ItemID,
+            List<ItemPreview> userItems = auctionsDBContext.Items
+                .Where(item => item.OwnerID == userID).Select(item=>new ItemPreview {
+                    ItemID = item.ItemID,
                     ItemName = item.ItemName,
                     CurrentPrice = item.Price,
-                    IsSold = acceptedOffer != null ? true : false
+                    IsSold = item.AcceptedOffer != null ? true : false,
+                    UserID = item.Owner.UserID,
+                    Name = item.Owner.Name,
+                    Lastname = item.Owner.Lastname,
+                    Category = item.Category.CategoryName,
+                    PreviewImage = item.ItemPhotos.Select(photo => photo.PhotoUrl).FirstOrDefault(),
+                    Price = item.Price
 
-                });
-            }
+                }).ToList();
 
-            return Ok(userItemsDTO);
+            return Ok(userItems);
         }
 
         [HttpGet("item-details/{itemID}")]
@@ -140,8 +138,8 @@ namespace AuctionsAppAPI.Controllers
             return Ok(itemDetails);
         }
 
-        [HttpGet("delete-item/{itemID}")]
-        public ActionResult DeleteItem(int itemID)
+        [HttpPost("delete-item/{itemID}")]
+        public ActionResult DeleteItem(int itemID,[FromBody] string notificationText)
         {
             Item item = auctionsDBContext.Items
                 .Include(item=>item.AcceptedOffer)
@@ -195,8 +193,8 @@ namespace AuctionsAppAPI.Controllers
             return Ok(administratorItemDetails);
         }
 
-        [HttpGet("block-item/{itemID}")]
-        public ActionResult BlockItem(int itemID)
+        [HttpPost("block-item/{itemID}")]
+        public ActionResult BlockItem(int itemID,[FromBody] string notificationText)
         {
             Item item = auctionsDBContext.Items.Where(item => item.ItemID == itemID).FirstOrDefault();
             item.IsItemBlocked = true;
@@ -205,8 +203,8 @@ namespace AuctionsAppAPI.Controllers
 
             return BadRequest();
         }
-        [HttpGet("unblock-item/{itemID}")]
-        public ActionResult UnblockItem(int itemID)
+        [HttpPost("unblock-item/{itemID}")]
+        public ActionResult UnblockItem(int itemID, [FromBody] string notificationText)
         {
             Item item = auctionsDBContext.Items.Where(item => item.ItemID == itemID).FirstOrDefault();
             item.IsItemBlocked = false;
@@ -214,6 +212,42 @@ namespace AuctionsAppAPI.Controllers
                 return Ok();
 
             return BadRequest();
+        }
+        [HttpGet("get-items")]
+        public ActionResult GetItemsForDisplay([FromQuery] ItemSearchQuery query)
+        {
+            
+            IQueryable<Item> userList = auctionsDBContext.Items.Where(item=>(item.AcceptedOffer!=null)==query.IsSold);
+
+            if (query.ItemName != null)
+                userList = userList.Where(item => item.ItemName.Contains(query.ItemName));
+
+            if(query.StartPrice>=0)
+                userList = userList.Where(item => item.Price>=query.StartPrice);
+
+            if (query.EndPrice > 0)
+                userList = userList.Where(item => item.Price <= query.EndPrice);
+
+            //if(query.CategoryID > 0)
+                //userList = userList.Where(item => item.CategoryID == query.CategoryID);
+
+
+            List<ItemPreview> itemPreviews = userList.Select(item => new ItemPreview
+            {
+                ItemID = item.ItemID,
+                ItemName = item.ItemName,
+                CurrentPrice = item.Price,
+                IsSold = item.AcceptedOffer != null ? true : false,
+                UserID = item.Owner.UserID,
+                Name = item.Owner.Name,
+                Lastname = item.Owner.Lastname,
+                Category = item.Category.CategoryName,
+                PreviewImage = item.ItemPhotos.Select(photo => photo.PhotoUrl).FirstOrDefault(),
+                Price = item.Price
+                }
+                ).ToList();
+
+            return Ok(itemPreviews);
         }
         private string UploadItemPhotos(IFormFile formFile)
         {

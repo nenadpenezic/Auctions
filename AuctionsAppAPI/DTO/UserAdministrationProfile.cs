@@ -7,6 +7,7 @@ namespace AuctionsAppAPI.DTO
 {
     public class UserAdministrationProfile
     {
+        public int UserID { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
         public string EmailForContact { get; set; }

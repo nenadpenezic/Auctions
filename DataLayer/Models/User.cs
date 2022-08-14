@@ -13,6 +13,7 @@ namespace DataLayer.Models
         public Account Account { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
+        public string ProfilePhoto { get; set; }
         public string EmailForContact { get; set; }
         public int PhoneNumber { get; set; }
         public DateTime JoinDate { get; set; }

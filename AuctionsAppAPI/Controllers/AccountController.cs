@@ -90,7 +90,6 @@ namespace AuctionsAppAPI.Controllers
             if (!account.IsAccountVerifyed)
                 return BadRequest("Account must be verified first");
 
-            //User user = auctionsDBContext.Users.Find(account.AccountID);
 
             AuthenticatedUser authenticatedUser = auctionsDBContext.Users.Where(user => user.UserID == account.AccountID)
                 .Select(user => new AuthenticatedUser
@@ -98,6 +97,7 @@ namespace AuctionsAppAPI.Controllers
                     UserID = user.UserID,
                     Name = user.Name,
                     Lastname = user.Lastname,
+                    ProfilePhoto = user.ProfilePhoto,
                     Notifications = user.Notifications.Select(notification => new NotificationDTO
                     {
                         NotificationID = notification.NotificationID,
@@ -110,35 +110,12 @@ namespace AuctionsAppAPI.Controllers
                     IsAccountComplete = true
                     }).FirstOrDefault();
 
-
-            //if (user == null)
-              //  authenticatedUser.IsAccountComplete = false;
-           // else
-           // {
-              //  List<NotificationDTO> notifications = auctionsDBContext
-                 //   .Notifications
-                   // .Where(notification => notification.UserID == user.UserID)
-                   // .Select(notification => new NotificationDTO { 
-                    //    NotificationID = notification.NotificationID,
-                      //  NotificationText = notification.NotificationText,
-                      //  ArriveDate = notification.ArriveDate,
-                      //  Open = notification.Open
-                   // })
-                   // .ToList();
-
-               // authenticatedUser.UserID = account.AccountID;
-               // authenticatedUser.IsAccountComplete = true;
-              //  authenticatedUser.Name = user.Name;
-              //  authenticatedUser.Lastname = user.Lastname;
-               // authenticatedUser.Notifications = notifications;
-           // }
-
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
             return Ok(new { Token = tokenString, userObj = authenticatedUser});
         }
 
-        [HttpGet("block-account/{accountID}")]
-        public ActionResult BlockAccount(int accountID)
+        [HttpPost("block-account/{accountID}")]
+        public ActionResult BlockAccount(int accountID, [FromBody] string notificationText)
         {
             Account account = auctionsDBContext.Accounts
                 .Where(account => account.AccountID == accountID)

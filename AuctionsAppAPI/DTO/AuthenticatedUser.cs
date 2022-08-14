@@ -13,5 +13,6 @@ namespace AuctionsAppAPI.DTO
         public string Name { get; set; }
         public string Lastname { get; set; }
         public ICollection<NotificationDTO> Notifications {get; set;}
+        public string ProfilePhoto { get; set; }
     }
 }

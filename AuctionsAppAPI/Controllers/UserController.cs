@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AuctionsAppAPI.Controllers
 {
@@ -18,18 +20,24 @@ namespace AuctionsAppAPI.Controllers
     {
         private AuctionsDBContext auctionsDBContext;
         private ITokenAuthorization userAuthorization;
+        private IWebHostEnvironment webHostEnvironment;
         public UserController(
             AuctionsDBContext _auctionsDBContext,
-            ITokenAuthorization _userAuthorization)
+            ITokenAuthorization _userAuthorization,
+             IWebHostEnvironment _webHostEnvironment
+            )
         {
             auctionsDBContext = _auctionsDBContext;
             userAuthorization = _userAuthorization;
+            webHostEnvironment = _webHostEnvironment;
         }
 
         [HttpPost("complete-account")]
         [Authorize]
-        public ActionResult CompleteAccount([FromBody] NewUser newUser)
+        public ActionResult CompleteAccount([FromForm] NewUser newUser)
         {
+         
+
             User user = new User()
             {
                 UserID = userAuthorization.GetCurrentUser(User.Claims),
@@ -38,7 +46,8 @@ namespace AuctionsAppAPI.Controllers
                 EmailForContact = newUser.EmailForContact,
                 PhoneNumber = newUser.PhoneNumber,
                 JoinDate = DateTime.Now,
-                LastTimeOnline = DateTime.Now
+                LastTimeOnline = DateTime.Now,
+                ProfilePhoto = UploadProfilePhoto(newUser.ProfilePicture)
             };
 
             auctionsDBContext.Users.Add(user);
@@ -50,12 +59,14 @@ namespace AuctionsAppAPI.Controllers
                     UserID = user.UserID,
                     Name = user.Name,
                     Lastname = user.Lastname,
+                    ProfilePhoto = user.ProfilePhoto,
                     Notifications = user.Notifications.Select(notification => new NotificationDTO
                     {
                         NotificationID = notification.NotificationID,
                         NotificationText = notification.NotificationText,
                         ArriveDate = notification.ArriveDate,
                         Open = notification.Open,
+                        
 
                     })
                     .ToList(),
@@ -101,7 +112,7 @@ namespace AuctionsAppAPI.Controllers
             List<UserAdministrationProfile> userAdministrationProfiles = auctionsDBContext.Users
                 .Where(user => user.Name.Contains(nameSplit[0]) && user.Lastname.Contains(nameSplit[1])).
                 Select(user=>new UserAdministrationProfile
-                {
+                {   UserID =user.UserID,
                     Name = user.Name,
                     Lastname = user.Lastname,
                     EmailForContact = user.EmailForContact,
@@ -110,6 +121,19 @@ namespace AuctionsAppAPI.Controllers
                 })
                 .ToList();
             return Ok(userAdministrationProfiles);
+        }
+
+        private string UploadProfilePhoto(IFormFile formFile)
+        {
+
+            string directoryPath = Path.Combine(webHostEnvironment.ContentRootPath, "Images");
+
+            using (var stream = new FileStream(Path.Combine(directoryPath, formFile.FileName), FileMode.Create))
+            {
+                formFile.CopyTo(stream);
+            }
+
+            return formFile.FileName;
         }
 
 
