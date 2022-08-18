@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220815205432_UpdatedColumnsTypes")]
+    partial class UpdatedColumnsTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,16 +42,11 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("RoleID")
-                        .HasColumnType("int");
-
                     b.Property<string>("VerificationString")
                         .IsRequired()
                         .HasColumnType("varchar(210)");
 
                     b.HasKey("AccountID");
-
-                    b.HasIndex("RoleID");
 
                     b.ToTable("Accounts");
                 });
@@ -70,22 +67,6 @@ namespace DataLayer.Migrations
                     b.ToTable("Categorys");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Currency", b =>
-                {
-                    b.Property<int>("CurrencyID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CurrencyName")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.HasKey("CurrencyID");
-
-                    b.ToTable("Currencies");
-                });
-
             modelBuilder.Entity("DataLayer.Models.Item", b =>
                 {
                     b.Property<int>("ItemID")
@@ -100,9 +81,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("datetime2(7)");
 
                     b.Property<int>("CategoryID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrencyID")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -122,8 +100,7 @@ namespace DataLayer.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<DateTime?>("SoldDate")
-                        .IsRequired()
+                    b.Property<DateTime>("SoldDate")
                         .HasColumnType("datetime2(7)");
 
                     b.HasKey("ItemID");
@@ -131,8 +108,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("AcceptedOfferID");
 
                     b.HasIndex("CategoryID");
-
-                    b.HasIndex("CurrencyID");
 
                     b.HasIndex("OwnerID");
 
@@ -229,7 +204,7 @@ namespace DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("Value")
-                        .HasColumnType("float");
+                        .HasColumnType("float(5)");
 
                     b.Property<bool>("isAccepted")
                         .HasColumnType("bit");
@@ -241,22 +216,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Offers");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.Role", b =>
-                {
-                    b.Property<int>("RoleID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("RoldeName")
-                        .IsRequired()
-                        .HasColumnType("varchar(15)");
-
-                    b.HasKey("RoleID");
-
-                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("DataLayer.Models.User", b =>
@@ -360,17 +319,6 @@ namespace DataLayer.Migrations
                     b.ToTable("UserReviews");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Account", b =>
-                {
-                    b.HasOne("DataLayer.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("DataLayer.Models.Item", b =>
                 {
                     b.HasOne("DataLayer.Models.Offer", "AcceptedOffer")
@@ -384,12 +332,6 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("DataLayer.Models.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("DataLayer.Models.User", "Owner")
                         .WithMany("Items")
                         .HasForeignKey("OwnerID")
@@ -399,8 +341,6 @@ namespace DataLayer.Migrations
                     b.Navigation("AcceptedOffer");
 
                     b.Navigation("Category");
-
-                    b.Navigation("Currency");
 
                     b.Navigation("Owner");
                 });

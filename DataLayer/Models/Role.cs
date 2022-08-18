@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class Category
+    public class Role
     {   [Key]
-        public int CategoryID { get; set; }
-        [Column(TypeName = "varchar(50)")]
+        public int RoleID { get; set; }
+        [Column(TypeName = "varchar(15)")]
         [Required]
-        public string CategoryName { get; set; }
+        public string RoldeName { get; set; }
     }
 }

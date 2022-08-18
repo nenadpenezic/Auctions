@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class Category
+    public class Currency
     {   [Key]
-        public int CategoryID { get; set; }
-        [Column(TypeName = "varchar(50)")]
+        public int CurrencyID { get; set; }
+        [Column(TypeName = "varchar(10)")]
         [Required]
-        public string CategoryName { get; set; }
+        public string CurrencyName { get; set; }
+
     }
 }

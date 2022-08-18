@@ -38,15 +38,14 @@ namespace AuctionsAppAPI.Controllers
         [Authorize]
         public ActionResult AddItem([FromForm ] NewItem newItem)
         {
-           
-            Item item = new Item()
-            {
+            Item item = new Item(){
                 ItemName = newItem.ItemName,
                 OwnerID = tokenAuthorization.GetCurrentUser(User.Claims),
                 Description = newItem.Description,
                 AddedDate = DateTime.Now,
                 CategoryID = newItem.CategoryID,
-                Price = 500
+                Price = newItem.Price,
+                CurrencyID = newItem.CurrencyID
             };
 
             List<NewItemSpecification> newItemSpecifications = JsonConvert
@@ -54,29 +53,22 @@ namespace AuctionsAppAPI.Controllers
             ICollection<ItemSpecification> itemSpecifications = new List<ItemSpecification>();
 
             foreach (NewItemSpecification element in newItemSpecifications)
-                itemSpecifications.Add(new ItemSpecification()
-                {
+                itemSpecifications.Add(new ItemSpecification(){
                     SpecificationName = element.SpecificationName,
                     SpecificationValue = element.SpecificationValue,
-                    
                 });
             
             item.ItemSpecifications = itemSpecifications;
 
-
-
             ICollection<ItemPhoto> itemPhotos  = new List<ItemPhoto>();
 
-            foreach (IFormFile element in newItem.ItemPictures)
-           {
+            foreach (IFormFile element in newItem.ItemPictures){
                 itemPhotos.Add(new ItemPhoto
                 {
                    PhotoUrl = UploadItemPhotos(element)
                 });
             }
             item.ItemPhotos = itemPhotos;
-
-
 
             auctionsDBContext.Items.Add(item);
             auctionsDBContext.SaveChanges();
@@ -216,8 +208,8 @@ namespace AuctionsAppAPI.Controllers
         [HttpGet("get-items")]
         public ActionResult GetItemsForDisplay([FromQuery] ItemSearchQuery query)
         {
-            
-            IQueryable<Item> userList = auctionsDBContext.Items.Where(item=>(item.AcceptedOffer!=null)==query.IsSold);
+
+            IQueryable<Item> userList = auctionsDBContext.Items;
 
             if (query.ItemName != null)
                 userList = userList.Where(item => item.ItemName.Contains(query.ItemName));
@@ -228,8 +220,11 @@ namespace AuctionsAppAPI.Controllers
             if (query.EndPrice > 0)
                 userList = userList.Where(item => item.Price <= query.EndPrice);
 
+            if(!query.IsSold)
+                userList = userList.Where(item => (item.AcceptedOffer != null) == query.IsSold);
+
             //if(query.CategoryID > 0)
-                //userList = userList.Where(item => item.CategoryID == query.CategoryID);
+            //userList = userList.Where(item => item.CategoryID == query.CategoryID);
 
 
             List<ItemPreview> itemPreviews = userList.Select(item => new ItemPreview

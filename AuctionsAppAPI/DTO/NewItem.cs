@@ -12,6 +12,8 @@ namespace AuctionsAppAPI.DTO
         public string Description { get; set; }
         public string NewItemSpecifications { get; set; }
         public int CategoryID { get; set; }
+        public int CurrencyID { get; set; }
+        public double Price { get; set; }
         public IEnumerable<IFormFile> ItemPictures {get; set;}
     }
 }

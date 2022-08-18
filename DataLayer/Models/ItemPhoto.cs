@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace DataLayer.Models
 {
     public class ItemPhoto
-    {
+    {   [Key]
         public int ItemPhotoID { get; set; }
         [Required]
+        [Column(TypeName = "int")]
         public int ItemID { get; set; }
         public Item Item { get; set; }
         [Required]

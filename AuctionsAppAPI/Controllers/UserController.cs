@@ -36,8 +36,6 @@ namespace AuctionsAppAPI.Controllers
         [Authorize]
         public ActionResult CompleteAccount([FromForm] NewUser newUser)
         {
-         
-
             User user = new User()
             {
                 UserID = userAuthorization.GetCurrentUser(User.Claims),
@@ -70,7 +68,8 @@ namespace AuctionsAppAPI.Controllers
 
                     })
                     .ToList(),
-                    IsAccountComplete = true
+                    IsAccountComplete = true,
+                    Role = user.Account.Role.RoldeName
                 }).FirstOrDefault();
 
             return Ok(authenticatedUser);

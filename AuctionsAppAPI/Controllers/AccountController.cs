@@ -36,33 +36,38 @@ namespace AuctionsAppAPI.Controllers
 
 
         [HttpPost("add-account")]
-        public ActionResult AddAccount([FromBody] NewAccount newAccount)
+        public ActionResult AddAccount([FromForm] NewAccount newAccount)
         {
-            string verificationString = GenerateVerificationString();
+            if (newAccount.Password != newAccount.ConfirmedPassword)
+                return BadRequest();
 
             Account existingAccoutn = auctionsDBContext.Accounts
                 .Where(acc => acc.Email == newAccount.Email)
                 .FirstOrDefault();
 
             if (existingAccoutn != null)
-                return BadRequest("Account with this email address aready exist!");
+                return BadRequest();
 
+            string verificationString = GenerateVerificationString();
 
             Account account = new Account()
             {
                 Email = newAccount.Email,
                 Password = newAccount.Password,
                 IsAccountVerifyed = false,
-                VerificationString = verificationString
+                VerificationString = verificationString,
+                IsBlocked = false,
+                RoleID = 1
             };
 
             auctionsDBContext.Accounts.Add(account);
             auctionsDBContext.SaveChanges();
 
-            string confirmationString = "<a href='" + "https://localhost:44301/api/Account/verify/"+ account.AccountID + "/" + verificationString +"'/>Click here to verify your accout</a>";
+            string confirmationString = "<a href='" + "https://localhost:44301/api/Account/verify/"+ 
+                account.AccountID + "/" + verificationString +"'/>Click here to verify your accout</a>";
             emailClient.SendEmail(account.Email, confirmationString);
 
-            return Ok("Check your email to confirm email adress and finish registration");
+            return Ok();
         }
 
         [HttpGet("verify/{userID}/{verificationString}")]
@@ -78,7 +83,7 @@ namespace AuctionsAppAPI.Controllers
         }
 
         [HttpPost("log-in")]
-        public ActionResult LogIn([FromBody] LogIn login)
+        public ActionResult LogIn([FromForm] LogIn login)
         {
             Account account = auctionsDBContext.Accounts
                 .Where(acc => acc.Email == login.Email && acc.Password == login.Password)
@@ -89,7 +94,6 @@ namespace AuctionsAppAPI.Controllers
 
             if (!account.IsAccountVerifyed)
                 return BadRequest("Account must be verified first");
-
 
             AuthenticatedUser authenticatedUser = auctionsDBContext.Users.Where(user => user.UserID == account.AccountID)
                 .Select(user => new AuthenticatedUser
@@ -104,10 +108,10 @@ namespace AuctionsAppAPI.Controllers
                         NotificationText = notification.NotificationText,
                         ArriveDate = notification.ArriveDate,
                         Open = notification.Open,
-                        
                     })
                     .ToList(),
-                    IsAccountComplete = true
+                    IsAccountComplete = true,
+                    Role = user.Account.Role.RoldeName
                     }).FirstOrDefault();
 
             string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());

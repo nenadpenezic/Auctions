@@ -10,6 +10,6 @@ namespace AuctionsAppAPI.DTO
         public string Name { get; set; }
         public string Lastname { get; set; }
         public DateTime OfferDate { get; set; }
-        public int Value { get; set; }
+        public double Value { get; set; }
     }
 }

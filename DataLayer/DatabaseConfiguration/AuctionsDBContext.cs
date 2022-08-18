@@ -16,15 +16,10 @@ namespace DataLayer.DatabaseConfiguration
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
-
-            
-
             modelBuilder.Entity<User>()
                 .HasOne(user => user.Account )
                 .WithOne()
                 .HasForeignKey<User>(user=>user.UserID);
-
 
             modelBuilder.Entity<UserReview>()
                 .HasKey(ur => ur.UserReviewID);
@@ -72,13 +67,13 @@ namespace DataLayer.DatabaseConfiguration
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserReview> UserReviews { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemSpecification> ItemSpecifications { get; set; }
-        //public DbSet<Auction> Auctions { get; set; }
-        //public DbSet<ItemAuctionParticipant> AuctionParticipants { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<ItemPhoto> ItemPhotos { get; set; }
         public DbSet<Category> Categorys { get; set; }
