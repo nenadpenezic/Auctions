@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.DTO
 {
-    public class UserAdministrationProfile
+    public class UserDetails
     {
         public int UserID { get; set; }
         public string Name { get; set; }

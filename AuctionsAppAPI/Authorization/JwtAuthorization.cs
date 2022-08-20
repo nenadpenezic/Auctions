@@ -13,13 +13,14 @@ namespace AuctionsAppAPI.Authorization
 {
     public class JwtAuthorization:ITokenAuthorization
     {
-        public string GenerateToken(string accountID)
+        public string GenerateToken(string accountID,string role)
         {
             SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
             SigningCredentials signingCredential = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claimsList = new List<Claim>();
 
             claimsList.Add(new Claim("AccountID", accountID));
+            claimsList.Add(new Claim("Role", role));
 
             JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(
                 issuer: "https://localhost:44301",

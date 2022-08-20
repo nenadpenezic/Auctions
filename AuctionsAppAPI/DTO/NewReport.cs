@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.DTO
 {
-    public class NewReview
+    public class NewReport
     {   public int UserID { get; set; }
-        public int Grade { get; set; }
-        public string Comment { get; set; }
+        public string Title { get; set; }
+        public string Explanation { get; set; }
     }
 }

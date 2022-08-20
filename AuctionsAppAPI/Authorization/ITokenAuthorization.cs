@@ -8,7 +8,7 @@ namespace AuctionsAppAPI.Authorization
 {
     public interface ITokenAuthorization
     {
-        public string GenerateToken(string accountID);
+        public string GenerateToken(string accountID, string role);
         public int GetCurrentUser(IEnumerable<Claim> claims);
     }
 }

@@ -12,6 +12,7 @@ namespace AuctionsAppAPI.DTO
         public string Lastname { get; set; }
         public string EmailForContact { get; set; }
         public string PhoneNumber { get; set; }
+        public string Location { get; set; }
         public DateTime DateOfBirth { get; set; }
         public IFormFile ProfilePicture { get; set; }
     }

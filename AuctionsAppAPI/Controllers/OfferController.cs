@@ -1,10 +1,12 @@
 ﻿using AuctionsAppAPI.Authorization;
 using AuctionsAppAPI.DTO;
+using AuctionsAppAPI.EmailClient;
 using DataLayer.DatabaseConfiguration;
 using DataLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,62 +20,68 @@ namespace AuctionsAppAPI.Controllers
     {
         private AuctionsDBContext auctionsDBContext;
         private ITokenAuthorization tokenAuthorization;
+        private IEmailClient emailClient;
         public OfferController(
             AuctionsDBContext _auctionsDBContext,
-            ITokenAuthorization _tokenAuthorization)
+            ITokenAuthorization _tokenAuthorization,
+             IEmailClient _emailClient)
         {
             auctionsDBContext = _auctionsDBContext;
             tokenAuthorization = _tokenAuthorization;
+            emailClient = _emailClient;
         }
 
-        [HttpPost("add-offer/{itemID}")]
+        [HttpPost("add-offer")]
         [Authorize]
-        public ActionResult AddOffer([FromBody] NewOffer offerValue,int itemID)
+        public ActionResult AddOffer([FromForm] NewOffer newOffer)
         {
             int UserID = tokenAuthorization.GetCurrentUser(User.Claims);
 
             Offer lastOffer = auctionsDBContext.Offers
+                .Include(offer=>offer.Item)
                 .OrderByDescending(offer => offer.Value)
-                .Where(offer=>offer.ItemID == itemID)
+                .Where(offer=>offer.ItemID == newOffer.ItemID)
                 .FirstOrDefault();
 
             if(lastOffer != null)
             {
                 if (lastOffer.isAccepted)
-                    return BadRequest("Item is aready sold!");
+                    return BadRequest("");
 
-                if (lastOffer.Value > offerValue.Value)
-                    return BadRequest("You must offer higher sum than previus one!");
+                if (lastOffer.Value > newOffer.Value)
+                    return BadRequest("");
+
+                if(lastOffer.UserID == UserID || lastOffer.Item.OwnerID == UserID)
+                    return BadRequest("");
             }
-
 
             Offer offer = new Offer()
             {
-               ItemID = itemID,
+               ItemID = newOffer.ItemID,
                UserID = UserID,
-               Value = offerValue.Value,
+               Value = newOffer.Value,
                OfferDate = DateTime.Now
             };
-            
 
             auctionsDBContext.Offers.Add(offer);
 
-            Item offerItem = auctionsDBContext.Items.Find(itemID);
-            offerItem.Price = offerValue.Value;
+            Item offerItem = auctionsDBContext.Items.Find(newOffer.ItemID);
+            offerItem.CurrentPrice = newOffer.Value;
 
             auctionsDBContext.SaveChanges();
 
-            ItemDetailsOffer itemDetailsOffer = auctionsDBContext.Offers
+            OfferDetails itemDetailsOffer = auctionsDBContext.Offers
                 .Where(off => off.OfferID == offer.OfferID)
-                .Select(offer => new ItemDetailsOffer()
+                .Select(offer => new OfferDetails()
             {
                 OfferID = offer.OfferID,
                 Name = offer.User.Name,
                 Lastname = offer.User.Lastname,
                 Value = offer.Value,
-                OfferDate = offer.OfferDate,
-                IsAccepted = offer.isAccepted
-            }).FirstOrDefault();
+                 AddedDate = offer.OfferDate,
+                IsAccepted = offer.isAccepted,
+                Currency = offer.Item.Currency.CurrencyName
+                }).FirstOrDefault();
 
             if(lastOffer==null)
                 return Ok(itemDetailsOffer);
@@ -81,29 +89,33 @@ namespace AuctionsAppAPI.Controllers
             Notification notification = new Notification()
             {
                 UserID = lastOffer.UserID,
-                NotificationText = "Your offer for " + offerItem.ItemName + " is not longer highest!",
+                NotificationTitle = "Licitacija",
+                NotificationText = "Vaša ponuda koju ste licitirali za predmet " 
+                + offerItem.ItemName + " nije vise vodeća!",
                 ArriveDate = DateTime.Now,
-                Open = false
+                Open = false,
             };
+
             auctionsDBContext.Notifications.Add(notification);
             auctionsDBContext.SaveChanges();
 
             return Ok(itemDetailsOffer);
-
         }
         [HttpGet("item-offers/{itemID}")]
         public ActionResult GetProductOffers(int itemID)
         {
-            List<ItemDetailsOffer> offers = auctionsDBContext.Offers.OrderByDescending(order => order.Value)
-                    .Select(offer => new ItemDetailsOffer
+            List<OfferDetails> offers = auctionsDBContext.Offers.OrderByDescending(order => order.Value)
+                    .Select(offer => new OfferDetails
                     {
                         OfferID = offer.OfferID,
+                        ItemID = offer.ItemID,
                         UserID = offer.UserID,
                         Name = offer.User.Name,
                         Lastname = offer.User.Lastname,
-                        OfferDate = offer.OfferDate,
+                        AddedDate = offer.OfferDate,
                         Value = offer.Value,
-                        IsAccepted = offer.isAccepted
+                        IsAccepted = offer.isAccepted,
+                        Currency = offer.Item.Currency.CurrencyName
 
                     }).ToList();
             return Ok(offers);
@@ -111,35 +123,77 @@ namespace AuctionsAppAPI.Controllers
 
         [HttpGet("accept-offer/{offerID}")]
         [Authorize]
-        public ActionResult AcceptOffer(int offerID) 
+        public ActionResult AcceptOffer(int offerID)
         {
-             Offer offer = auctionsDBContext.Offers
-                .Where(offer=>offer.OfferID == offerID)
+            int currentUser = tokenAuthorization.GetCurrentUser(User.Claims);
+
+            Offer offer = auctionsDBContext.Offers
+                .Include(offer => offer.User)
+                .Where(offer => offer.OfferID == offerID)
                 .FirstOrDefault();
 
-             if (offer.isAccepted)
-                return BadRequest("Offer accepted aready");
-             offer.isAccepted = true;
-            Item item = auctionsDBContext.Items.Where(item => item.ItemID == offer.ItemID).FirstOrDefault();
+            Offer acceptedOffer = auctionsDBContext.Offers
+                .Where(acceptedOffer => (acceptedOffer.ItemID == offer.ItemID) && offer.isAccepted)
+                .FirstOrDefault();
+
+            if (acceptedOffer != null)
+                return BadRequest("");
+
+            Item item = auctionsDBContext.Items
+                .Include(item => item.Owner)
+                .Where(item => item.ItemID == offer.ItemID)
+                .FirstOrDefault();
+
+            offer.isAccepted = true;
+
             item.AcceptedOfferID = offer.OfferID;
-             auctionsDBContext.SaveChanges();
+            auctionsDBContext.SaveChanges();
+
+            string message = "Vaša ponuda za " + item.ItemName + " je prihvaćena." +
+                " Za dalji dogovor sa prodavcem mozete ga kontaktirati putem email adrese: "
+                + item.Owner.EmailForContact + " ili telefonom: " + item.Owner.PhoneNumber;
+
+            emailClient.SendEmail(offer.User.EmailForContact, message);
+
+            Notification notification = new Notification()
+            {
+                NotificationTitle = "Prihvaćena ponuda za " + item.ItemName,
+                NotificationText = "Na vasu email adresu poslat je email sa detaljima.",
+                ArriveDate = DateTime.Now,
+                Open = false,
+                UserID = offer.User.UserID
+                
+            };
 
             return Ok(offerID);
         }
-        [HttpGet("reject-offer/{offerID}")]
+
+        [HttpDelete("reject-offer/{offerID}")]
         public ActionResult RejectOffer(int offerID)
         {
             Offer offer = auctionsDBContext.Offers
                 .Where(offer => offer.OfferID == offerID)
                 .FirstOrDefault();
-            auctionsDBContext.Offers.Remove(offer);
 
-            
+            Item item = auctionsDBContext.Items.Find(offer.ItemID);
+
+            Offer secondHighestOffer = auctionsDBContext.Offers
+                .OrderByDescending(offer => offer.Value)
+                .Where(offer => offer.ItemID == item.ItemID)
+                .Skip(1)
+                .FirstOrDefault();
+
+           if(secondHighestOffer != null)
+                item.CurrentPrice = secondHighestOffer.Value;
+           else
+                item.CurrentPrice = item.StartPrice;
+
+            item.AcceptedOffer = null;
+           auctionsDBContext.Offers.Remove(offer);
 
             auctionsDBContext.SaveChanges();
 
             return Ok();
-
         }
     }
 }

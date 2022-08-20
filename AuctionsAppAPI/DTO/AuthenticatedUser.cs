@@ -12,7 +12,7 @@ namespace AuctionsAppAPI.DTO
         public bool IsAccountComplete { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
-        public ICollection<NotificationDTO> Notifications {get; set;}
+        public ICollection<NotificationDetails> Notifications {get; set;}
         public string ProfilePhoto { get; set; }
         public string Role { get; set; }
     }

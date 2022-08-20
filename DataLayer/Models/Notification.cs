@@ -17,6 +17,9 @@ namespace DataLayer.Models
         public User User { get; set; }
         [Required]
         [Column(TypeName = "varchar(50)")]
+        public string NotificationTitle { get; set; }
+        [Required]
+        [Column(TypeName = "varchar(150)")]
         public string NotificationText { get; set; }
         [Required]
         [Column(TypeName = "datetime2(7)")]

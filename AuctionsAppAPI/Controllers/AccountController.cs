@@ -13,6 +13,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuctionsAppAPI.Controllers
 {
@@ -86,6 +88,7 @@ namespace AuctionsAppAPI.Controllers
         public ActionResult LogIn([FromForm] LogIn login)
         {
             Account account = auctionsDBContext.Accounts
+                .Include(account=>account.Role)
                 .Where(acc => acc.Email == login.Email && acc.Password == login.Password)
                 .FirstOrDefault();
 
@@ -102,7 +105,7 @@ namespace AuctionsAppAPI.Controllers
                     Name = user.Name,
                     Lastname = user.Lastname,
                     ProfilePhoto = user.ProfilePhoto,
-                    Notifications = user.Notifications.Select(notification => new NotificationDTO
+                    Notifications = user.Notifications.Select(notification => new NotificationDetails
                     {
                         NotificationID = notification.NotificationID,
                         NotificationText = notification.NotificationText,
@@ -114,22 +117,41 @@ namespace AuctionsAppAPI.Controllers
                     Role = user.Account.Role.RoldeName
                     }).FirstOrDefault();
 
-            string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString());
+            string tokenString = userAuthorization.GenerateToken(account.AccountID.ToString(), account.Role.RoldeName);
             return Ok(new { Token = tokenString, userObj = authenticatedUser});
         }
 
-        [HttpPost("block-account/{accountID}")]
-        public ActionResult BlockAccount(int accountID, [FromBody] string notificationText)
+        [HttpPut("administrator/{accountID}/block/{type}")]
+        [Authorize]
+        public ActionResult SwitchBlockStatus(int accountID, string type, [FromForm] string notificationText)
         {
+            Claim role = User.Claims
+                .FirstOrDefault(claim => claim.Type.ToString()
+                .Equals("Role", StringComparison.InvariantCultureIgnoreCase));
+
+            if (!String.Equals(role.Value, "Administrator"))
+                return Unauthorized();
+
             Account account = auctionsDBContext.Accounts
                 .Where(account => account.AccountID == accountID)
                 .FirstOrDefault();
-            account.IsBlocked = true;
-            if(auctionsDBContext.SaveChanges() > 0)
-                return Ok();
 
-            return BadRequest();
+            if (account.IsBlocked && String.Equals(type.ToLower(), "block"))
+                return BadRequest("");
+
+            if (!account.IsBlocked && String.Equals(type.ToLower(), "unblock"))
+                return BadRequest("");
+
+
+            account.IsBlocked = !account.IsBlocked;
+            auctionsDBContext.SaveChanges();
+
+           
+            emailClient.SendEmail(account.Email, notificationText);
+
+            return Ok();
         }
+
         [HttpGet("unblock-account/{accountID}")]
         public ActionResult UnblockAccount(int accountID)
         {

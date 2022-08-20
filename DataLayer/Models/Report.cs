@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class UserReport
+    public class Report
     {   [Key]
         public int UserReportID { get; set; }
         [Required]
@@ -20,7 +20,7 @@ namespace DataLayer.Models
         public int ReportAgainstUserID { get; set; }
         public User ReportAgainstUser { get; set; }
         [Required]
-        [Column(TypeName = "varchar(15)")]
+        [Column(TypeName = "varchar(35)")]
         public string ReportTitle { get; set; }
         [Required]
         [Column(TypeName = "varchar(100)")]

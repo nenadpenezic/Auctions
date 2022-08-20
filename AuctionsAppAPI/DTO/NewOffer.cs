@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace AuctionsAppAPI.DTO
 {
     public class NewOffer
-    {
+    {   public int ItemID { get; set; }
         public double Value { get; set; }
     }
 }

@@ -27,14 +27,18 @@ namespace DataLayer.Models
         [Column(TypeName = "varchar(15)")]  //datetime2(7)
         [Required]
         public string PhoneNumber { get; set; }
-        [Column(TypeName = "datetime2(7)")]  //datetime2(7)
+        [Column(TypeName = "varchar(25)")]
+        [Required]
+        public string Location { get; set; }
+        [Column(TypeName = "datetime2(7)")]
         [Required]
         public DateTime JoinDate { get; set; }
-        [Column(TypeName = "datetime2(7)")]  //datetime2(7)
+        [Column(TypeName = "datetime2(7)")] 
         [Required]
+
         public DateTime? LastTimeOnline { get; set; }
         public ICollection<Notification> Notifications { get; set; }
-        public ICollection <UserReview> UserPersonalReviews { get; set; }
+        public ICollection <Review> UserPersonalReviews { get; set; }
         public ICollection <Item> Items { get; set; }
 
     }

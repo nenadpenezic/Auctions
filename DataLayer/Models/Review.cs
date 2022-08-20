@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class UserReview
+    public class Review
     {   [Key]
         public int UserReviewID { get; set; }
         [Required]

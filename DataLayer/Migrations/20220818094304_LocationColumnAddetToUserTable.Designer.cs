@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220818094304_LocationColumnAddetToUserTable")]
+    partial class LocationColumnAddetToUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +107,6 @@ namespace DataLayer.Migrations
                     b.Property<int>("CurrencyID")
                         .HasColumnType("int");
 
-                    b.Property<double>("CurrentPrice")
-                        .HasColumnType("float");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
@@ -117,13 +116,17 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("ItemName")
                         .IsRequired()
-                        .HasColumnType("varchar(45)");
+                        .HasColumnType("varchar(35)");
 
                     b.Property<int>("OwnerID")
                         .HasColumnType("int");
 
-                    b.Property<double>("StartPrice")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
+
+                    b.Property<DateTime?>("SoldDate")
+                        .IsRequired()
+                        .HasColumnType("datetime2(7)");
 
                     b.HasKey("ItemID");
 
@@ -171,11 +174,11 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("SpecificationName")
                         .IsRequired()
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("SpecificationValue")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(25)");
 
                     b.HasKey("ItemSpecificationID");
 
@@ -195,10 +198,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("datetime2(7)");
 
                     b.Property<string>("NotificationText")
-                        .IsRequired()
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<string>("NotificationTitle")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
@@ -244,71 +243,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Offers");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.Report", b =>
-                {
-                    b.Property<int>("UserReportID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2(7)");
-
-                    b.Property<int>("ReportAgainstUserID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReportDetails")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("ReportTitle")
-                        .IsRequired()
-                        .HasColumnType("varchar(35)");
-
-                    b.Property<int>("UserReporterID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserReportID");
-
-                    b.HasIndex("ReportAgainstUserID");
-
-                    b.HasIndex("UserReporterID");
-
-                    b.ToTable("UserReports");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.Review", b =>
-                {
-                    b.Property<int>("UserReviewID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("varchar(60)");
-
-                    b.Property<int>("Grade")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReviewDate")
-                        .HasColumnType("datetime2(7)");
-
-                    b.Property<int>("ReviewerID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserReviewID");
-
-                    b.HasIndex("ReviewerID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("UserReviews");
                 });
 
             modelBuilder.Entity("DataLayer.Models.Role", b =>
@@ -365,6 +299,71 @@ namespace DataLayer.Migrations
                     b.HasKey("UserID");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.UserReport", b =>
+                {
+                    b.Property<int>("UserReportID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2(7)");
+
+                    b.Property<int>("ReportAgainstUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReportDetails")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ReportTitle")
+                        .IsRequired()
+                        .HasColumnType("varchar(15)");
+
+                    b.Property<int>("UserReporterID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserReportID");
+
+                    b.HasIndex("ReportAgainstUserID");
+
+                    b.HasIndex("UserReporterID");
+
+                    b.ToTable("UserReports");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.UserReview", b =>
+                {
+                    b.Property<int>("UserReviewID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("datetime2(7)");
+
+                    b.Property<int>("ReviewerID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserReviewID");
+
+                    b.HasIndex("ReviewerID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserReviews");
                 });
 
             modelBuilder.Entity("DataLayer.Models.Account", b =>
@@ -464,7 +463,18 @@ namespace DataLayer.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Report", b =>
+            modelBuilder.Entity("DataLayer.Models.User", b =>
+                {
+                    b.HasOne("DataLayer.Models.Account", "Account")
+                        .WithOne()
+                        .HasForeignKey("DataLayer.Models.User", "UserID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.UserReport", b =>
                 {
                     b.HasOne("DataLayer.Models.User", "ReportAgainstUser")
                         .WithMany()
@@ -483,7 +493,7 @@ namespace DataLayer.Migrations
                     b.Navigation("UserReporter");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Review", b =>
+            modelBuilder.Entity("DataLayer.Models.UserReview", b =>
                 {
                     b.HasOne("DataLayer.Models.User", "Reviewer")
                         .WithMany()
@@ -500,17 +510,6 @@ namespace DataLayer.Migrations
                     b.Navigation("Reviewer");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataLayer.Models.User", b =>
-                {
-                    b.HasOne("DataLayer.Models.Account", "Account")
-                        .WithOne()
-                        .HasForeignKey("DataLayer.Models.User", "UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("DataLayer.Models.Item", b =>

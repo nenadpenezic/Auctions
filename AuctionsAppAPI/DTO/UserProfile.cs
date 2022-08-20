@@ -15,7 +15,7 @@ namespace AuctionsAppAPI.DTO
         public string PhoneNumber { get; set; }
         public DateTime JoinDate { get; set; }
         public DateTime? LastTimeOnline { get; set; }
-
+        public string Location { get; set; }
         public double AverageGrade { get; set; }
 
         public int NumberOfReviews { get; set; }

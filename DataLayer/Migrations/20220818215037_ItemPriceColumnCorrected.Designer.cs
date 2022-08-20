@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220818215037_ItemPriceColumnCorrected")]
+    partial class ItemPriceColumnCorrected
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,7 +177,7 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("SpecificationValue")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("ItemSpecificationID");
 
@@ -265,7 +267,7 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("ReportTitle")
                         .IsRequired()
-                        .HasColumnType("varchar(35)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<int>("UserReporterID")
                         .HasColumnType("int");

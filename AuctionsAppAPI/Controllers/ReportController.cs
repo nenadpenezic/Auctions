@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.Controllers
@@ -27,33 +28,40 @@ namespace AuctionsAppAPI.Controllers
             tokenAuthorization = _tokenAuthorization;
         }
 
-        [HttpPost("report-user/{userID}")]
+        [HttpPost("report-user")]
         [Authorize]
-        public ActionResult ReportUser([FromBody] UserReportDTO report, int userID)
+        public ActionResult AddReport([FromForm] NewReport report)
         {
             int currentUser = tokenAuthorization.GetCurrentUser(User.Claims);
-
-            UserReport userReport = new UserReport()
+           
+            Report userReport = new Report()
             {
                 UserReporterID = currentUser,
-                ReportAgainstUserID = userID,
-                ReportTitle = report.ReportTitle,
-                ReportDetails = report.Report,
+                ReportAgainstUserID = report.UserID,
+                ReportTitle = report.Title,
+                ReportDetails = report.Explanation,
                 DateTime = DateTime.Now
             };
 
             auctionsDBContext.UserReports.Add(userReport);
-            if(auctionsDBContext.SaveChanges()>0)
-                return Ok(report);
+            auctionsDBContext.SaveChanges();
 
-            return BadRequest();
+            return Ok();
         }
 
         [HttpGet ("get-reports")]
-      
+        [Authorize]
         public ActionResult GetReports()
         {
-            List<UserReportDetails> userReportDetails = auctionsDBContext.UserReports.Select(userReport => new UserReportDetails
+            Claim role = User.Claims
+                 .FirstOrDefault(claim => claim.Type.ToString()
+                 .Equals("Role", StringComparison.InvariantCultureIgnoreCase));
+
+            if (!String.Equals(role.Value, "Administrator"))
+                return Unauthorized();
+
+            List<UserReportDetails> userReportDetails = auctionsDBContext.UserReports
+                .Select(userReport => new UserReportDetails
             {
                 ReporterID = userReport.UserReporterID,
                 ReporterName = userReport.UserReporter.Name,
@@ -69,26 +77,6 @@ namespace AuctionsAppAPI.Controllers
             }).ToList();
 
             return Ok(userReportDetails);
-        }
-
-
-        [HttpPost("administrator/send-report-notification/{userID}")]
-
-        public ActionResult SendReportStatusNotification([FromBody] string notificationText,int userID)
-        {
-
-            Notification notification = new Notification()
-            {
-                UserID = userID,
-                NotificationText = notificationText,
-                ArriveDate = DateTime.Now,
-                Open = false
-            };
-            auctionsDBContext.Notifications.Add(notification);
-            if (auctionsDBContext.SaveChanges() > 0)
-                return Ok(notificationText);
-
-            return BadRequest();
         }
 
 

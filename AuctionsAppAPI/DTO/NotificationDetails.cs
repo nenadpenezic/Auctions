@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.DTO
 {
-    public class NotificationDTO
+    public class NotificationDetails
     {
         public int NotificationID { get; set; }
         public string NotificationText { get; set; }

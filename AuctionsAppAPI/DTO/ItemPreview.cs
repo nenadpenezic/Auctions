@@ -16,7 +16,5 @@ namespace AuctionsAppAPI.DTO
         public string Category { get; set; }
         public bool IsSold { get; set; }
         public string PreviewImage { get; set; }
-
-        public double Price { get; set; }
     }
 }

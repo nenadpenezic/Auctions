@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AuctionsAppAPI.DTO
 {
-    public class Review
+    public class ReviewDetails
     {
         public string Name { get; set; }
         public string Lastname { get; set; }

@@ -4,14 +4,16 @@ using DataLayer.DatabaseConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AuctionsDBContext))]
-    partial class AuctionsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220818172009_RemovedSoldDateColumn")]
+    partial class RemovedSoldDateColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +107,6 @@ namespace DataLayer.Migrations
                     b.Property<int>("CurrencyID")
                         .HasColumnType("int");
 
-                    b.Property<double>("CurrentPrice")
-                        .HasColumnType("float");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
@@ -117,12 +116,12 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("ItemName")
                         .IsRequired()
-                        .HasColumnType("varchar(45)");
+                        .HasColumnType("varchar(35)");
 
                     b.Property<int>("OwnerID")
                         .HasColumnType("int");
 
-                    b.Property<double>("StartPrice")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("ItemID");
@@ -171,11 +170,11 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("SpecificationName")
                         .IsRequired()
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("SpecificationValue")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(25)");
 
                     b.HasKey("ItemSpecificationID");
 
@@ -195,10 +194,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("datetime2(7)");
 
                     b.Property<string>("NotificationText")
-                        .IsRequired()
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<string>("NotificationTitle")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
@@ -265,7 +260,7 @@ namespace DataLayer.Migrations
 
                     b.Property<string>("ReportTitle")
                         .IsRequired()
-                        .HasColumnType("varchar(35)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<int>("UserReporterID")
                         .HasColumnType("int");

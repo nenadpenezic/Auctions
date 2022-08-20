@@ -45,6 +45,7 @@ namespace AuctionsAppAPI.Controllers
                 PhoneNumber = newUser.PhoneNumber,
                 JoinDate = DateTime.Now,
                 LastTimeOnline = DateTime.Now,
+                Location = newUser.Location,
                 ProfilePhoto = UploadProfilePhoto(newUser.ProfilePicture)
             };
 
@@ -58,7 +59,7 @@ namespace AuctionsAppAPI.Controllers
                     Name = user.Name,
                     Lastname = user.Lastname,
                     ProfilePhoto = user.ProfilePhoto,
-                    Notifications = user.Notifications.Select(notification => new NotificationDTO
+                    Notifications = user.Notifications.Select(notification => new NotificationDetails
                     {
                         NotificationID = notification.NotificationID,
                         NotificationText = notification.NotificationText,
@@ -86,18 +87,19 @@ namespace AuctionsAppAPI.Controllers
                     PhoneNumber = userProfile.PhoneNumber,
                     JoinDate = userProfile.JoinDate,
                     LastTimeOnline = userProfile.LastTimeOnline,
-                    //AverageGrade = userProfile.UserPersonalReviews).Select(ups => ups.Grade).Average(),
+                    AverageGrade = userProfile.UserPersonalReviews.Count > 0 ?
+                                    userProfile.UserPersonalReviews.Select(ups => ups.Grade).Average() : 0,
                     NumberOfReviews = userProfile.UserPersonalReviews.Count,
                     NumberOfItemsOnSale = userProfile.Items.Count,
-
+                    Location = userProfile.Location
                 }).FirstOrDefault();
             return Ok(userProfile);
         }
 
 
 
-        [HttpPost("administrator-users")]
-        public ActionResult GetUsersForAdministrator([FromBody] string name)
+        [HttpPost("administrator/users")]
+        public ActionResult GetUserDetails([FromQuery] string name)
         {
             List<string> nameSplit = name.Split(' ').ToList();
 
@@ -108,9 +110,9 @@ namespace AuctionsAppAPI.Controllers
             }
                 
 
-            List<UserAdministrationProfile> userAdministrationProfiles = auctionsDBContext.Users
+            List<UserDetails> userAdministrationProfiles = auctionsDBContext.Users
                 .Where(user => user.Name.Contains(nameSplit[0]) && user.Lastname.Contains(nameSplit[1])).
-                Select(user=>new UserAdministrationProfile
+                Select(user=>new UserDetails
                 {   UserID =user.UserID,
                     Name = user.Name,
                     Lastname = user.Lastname,

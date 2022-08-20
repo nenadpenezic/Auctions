@@ -16,10 +16,10 @@ namespace DataLayer.Models
         public int ItemID { get; set; }
         public Item Item { get; set; }
         [Required]
-        [Column(TypeName = "varchar(15)")]
+        [Column(TypeName = "varchar(30)")]
         public string SpecificationName { get; set; }
         [Required]
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "varchar(100)")]
         public string SpecificationValue { get; set; }
     }
 }

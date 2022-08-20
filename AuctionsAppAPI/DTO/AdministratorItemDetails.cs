@@ -10,13 +10,14 @@ namespace AuctionsAppAPI.DTO
         public int ItemID { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
+        public string UserPhoto { get; set; }
         public string ItemName { get; set; }
-
-        
-        public double Price { get; set; }
+        public double CurrentPrice { get; set; }
         public bool IsItemBlocked { get; set; }
         public DateTime AddedDate { get; set; }
         public bool IsSold { get; set; }
+        public string Photo { get; set; }
+
 
     }
 }
