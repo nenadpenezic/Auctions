@@ -40,7 +40,7 @@ namespace AuctionsAppAPI.Controllers
         [HttpPost("add-account")]
         public ActionResult AddAccount([FromForm] NewAccount newAccount)
         {
-            if (newAccount.Password != newAccount.ConfirmedPassword)
+            if (!ModelState.IsValid || newAccount.Password != newAccount.ConfirmedPassword)
                 return BadRequest();
 
             Account existingAccoutn = auctionsDBContext.Accounts
@@ -87,16 +87,19 @@ namespace AuctionsAppAPI.Controllers
         [HttpPost("log-in")]
         public ActionResult LogIn([FromForm] LogIn login)
         {
+            if(!ModelState.IsValid)
+                return BadRequest();
+
             Account account = auctionsDBContext.Accounts
                 .Include(account=>account.Role)
                 .Where(acc => acc.Email == login.Email && acc.Password == login.Password)
                 .FirstOrDefault();
 
             if (account == null)
-                return BadRequest("Wrong Email or Password!");
+                return BadRequest();
 
             if (!account.IsAccountVerifyed)
-                return BadRequest("Account must be verified first");
+                return BadRequest();
 
             AuthenticatedUser authenticatedUser = auctionsDBContext.Users.Where(user => user.UserID == account.AccountID)
                 .Select(user => new AuthenticatedUser

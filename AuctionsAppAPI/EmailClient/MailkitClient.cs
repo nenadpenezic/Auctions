@@ -21,7 +21,7 @@ namespace AuctionsAppAPI.EmailClient
 
             using SmtpClient smtp = new SmtpClient();
             smtp.Connect("smtp.ethereal.email", 587, SecureSocketOptions.StartTls);
-            smtp.Authenticate("tatum.abbott@ethereal.email", "9Hxu7HDGBRW4DZE1KF"); //https://ethereal.email/
+            smtp.Authenticate("claud.stiedemann18@ethereal.email", "CudRacNNhs7RAnPwff"); //https://ethereal.email/
             smtp.Send(email);
             smtp.Disconnect(true);
 

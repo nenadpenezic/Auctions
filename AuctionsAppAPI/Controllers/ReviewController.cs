@@ -26,14 +26,17 @@ namespace AuctionsAppAPI.Controllers
             tokenAuthorization = _tokenAuthorization;
         }
 
-        [HttpPost("add-review")]
+        [HttpPost("add-review/{userID}")]
         [Authorize]
-        public ActionResult AddReview([FromForm] NewReview newReview)
+        public ActionResult AddReview(int userID,[FromForm] NewReview newReview)
         {
+            if(!ModelState.IsValid)
+                return BadRequest();
+
             int reviewerID = tokenAuthorization.GetCurrentUser(User.Claims);
 
             Offer acceptedOffer = auctionsDBContext.Offers
-                .Where(offer => offer.Item.OwnerID == newReview.UserID && offer.UserID == reviewerID && offer.isAccepted)
+                .Where(offer => offer.Item.OwnerID == userID && offer.UserID == reviewerID && offer.isAccepted)
                 .FirstOrDefault();
 
             if (acceptedOffer == null)
@@ -42,7 +45,7 @@ namespace AuctionsAppAPI.Controllers
             DataLayer.Models.Review userReview = new DataLayer.Models.Review()
             {
                 ReviewerID = reviewerID,
-                UserID = newReview.UserID,
+                UserID = userID,
                 Comment = newReview.Comment,
                 Grade = newReview.Grade,
                 ReviewDate = DateTime.Now

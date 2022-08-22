@@ -36,6 +36,10 @@ namespace AuctionsAppAPI.Controllers
         [Authorize]
         public ActionResult CompleteAccount([FromForm] NewUser newUser)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest("");
+
             User user = new User()
             {
                 UserID = userAuthorization.GetCurrentUser(User.Claims),
@@ -65,8 +69,6 @@ namespace AuctionsAppAPI.Controllers
                         NotificationText = notification.NotificationText,
                         ArriveDate = notification.ArriveDate,
                         Open = notification.Open,
-                        
-
                     })
                     .ToList(),
                     IsAccountComplete = true,

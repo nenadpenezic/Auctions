@@ -28,16 +28,19 @@ namespace AuctionsAppAPI.Controllers
             tokenAuthorization = _tokenAuthorization;
         }
 
-        [HttpPost("report-user")]
+        [HttpPost("report-user/{userID}")]
         [Authorize]
-        public ActionResult AddReport([FromForm] NewReport report)
+        public ActionResult AddReport(int userID,[FromForm] NewReport report)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             int currentUser = tokenAuthorization.GetCurrentUser(User.Claims);
            
             Report userReport = new Report()
             {
                 UserReporterID = currentUser,
-                ReportAgainstUserID = report.UserID,
+                ReportAgainstUserID = userID,
                 ReportTitle = report.Title,
                 ReportDetails = report.Explanation,
                 DateTime = DateTime.Now

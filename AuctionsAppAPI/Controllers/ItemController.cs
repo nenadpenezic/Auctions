@@ -43,6 +43,9 @@ namespace AuctionsAppAPI.Controllers
         [Authorize]
         public ActionResult AddItem([FromForm ] NewItem newItem)
         {
+            if(!ModelState.IsValid)
+                return BadRequest("");
+
             Item item = new Item(){
                 ItemName = newItem.ItemName,
                 OwnerID = tokenAuthorization.GetCurrentUser(User.Claims),

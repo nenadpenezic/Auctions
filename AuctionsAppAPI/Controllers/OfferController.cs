@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,16 +32,19 @@ namespace AuctionsAppAPI.Controllers
             emailClient = _emailClient;
         }
 
-        [HttpPost("add-offer")]
+        [HttpPost("add-offer/{itemID}")]
         [Authorize]
-        public ActionResult AddOffer([FromForm] NewOffer newOffer)
+        public ActionResult AddOffer(int itemID, [FromBody] [Required] double offerValue)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("");
+
             int UserID = tokenAuthorization.GetCurrentUser(User.Claims);
 
             Offer lastOffer = auctionsDBContext.Offers
                 .Include(offer=>offer.Item)
                 .OrderByDescending(offer => offer.Value)
-                .Where(offer=>offer.ItemID == newOffer.ItemID)
+                .Where(offer=>offer.ItemID == itemID)
                 .FirstOrDefault();
 
             if(lastOffer != null)
@@ -48,25 +52,29 @@ namespace AuctionsAppAPI.Controllers
                 if (lastOffer.isAccepted)
                     return BadRequest("");
 
-                if (lastOffer.Value > newOffer.Value)
+                if (lastOffer.Value >= offerValue)
                     return BadRequest("");
 
-                if(lastOffer.UserID == UserID || lastOffer.Item.OwnerID == UserID)
+                if(lastOffer.UserID == UserID)
                     return BadRequest("");
+
+                if(UserID == lastOffer.Item.OwnerID)
+                    return BadRequest("");
+
             }
 
             Offer offer = new Offer()
             {
-               ItemID = newOffer.ItemID,
+               ItemID = itemID,
                UserID = UserID,
-               Value = newOffer.Value,
+               Value = offerValue,
                OfferDate = DateTime.Now
             };
 
             auctionsDBContext.Offers.Add(offer);
 
-            Item offerItem = auctionsDBContext.Items.Find(newOffer.ItemID);
-            offerItem.CurrentPrice = newOffer.Value;
+            Item offerItem = auctionsDBContext.Items.Find(itemID);
+            offerItem.CurrentPrice = offerValue;
 
             auctionsDBContext.SaveChanges();
 
